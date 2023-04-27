@@ -5,7 +5,7 @@
 	"name": "PianoCraft",
 	"description": "This is an example description! Tell everyone what your mod is about!",
 	"authors": [
-		"Me!"
+		"FunskyDev"
 	],
 	"contact": {
 		"homepage": "https://fabricmc.net/",
@@ -16,21 +16,14 @@
 	"environment": "*",
 	"entrypoints": {
 		"main": [
-			"funskydev.ExampleMod"
-		],
-		"client": [
-			"funskydev.ExampleModClient"
+			"funskydev.pianocraft.PCMain"
 		],
 		"fabric-datagen": [
-			"funskydev.ExampleModDataGenerator"
+			"funskydev.pianocraft.datagen.PCDataGen"
 		]
 	},
 	"mixins": [
-		"pianocraft.mixins.json",
-		{
-			"config": "pianocraft.client.mixins.json",
-			"environment": "client"
-		}
+		"pianocraft.mixins.json"
 	],
 	"depends": {
 		"fabricloader": ">=0.14.19",
