@@ -12,6 +12,8 @@ public class PCDataGen implements DataGeneratorEntrypoint {
 
         pack.addProvider(PCLangGen::new);
         pack.addProvider(PCModelGen::new);
+        pack.addProvider(PCBlockTagGen::new);
+        pack.addProvider(PCLootGen::new);
 
     }
 

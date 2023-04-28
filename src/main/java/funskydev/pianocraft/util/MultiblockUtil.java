@@ -1,12 +1,9 @@
 package funskydev.pianocraft.util;
 
 import funskydev.pianocraft.PCMain;
-import funskydev.pianocraft.block.MultiblockMainPart;
 import funskydev.pianocraft.block.MultiblockPartBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.HorizontalFacingBlock;
-import net.minecraft.block.MapColor;
-import net.minecraft.block.Material;
 import net.minecraft.registry.Registries;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
@@ -104,9 +101,9 @@ public class MultiblockUtil {
 
     public static Map<BlockPos, BlockPosEnum> getMultBlocks(BlockPos source, Direction mainBlockFacing, MultiblockEnum multiblock) {
 
-        Map<BlockPos, BlockPosEnum> blocks = new HashMap<BlockPos, BlockPosEnum>();
+        Map<BlockPos, BlockPosEnum> blocks = new HashMap<>();
 
-        for(BlockPosEnum pos : multiblock.getBlocksPos()) {
+        for(BlockPosEnum pos : multiblock.getBlocksPosList()) {
 
             switch(pos) {
                 case WEST:
@@ -136,12 +133,8 @@ public class MultiblockUtil {
 
         for(Map.Entry<BlockPos, BlockPosEnum> entry : blocks.entrySet()) {
 
-            //Block newBlock = ForgeRegistries.BLOCKS.getValue(new ResourceLocation(Main.MODID, multiBlockEnum.getName(entry.getValue())));
             Block newBlock = Registries.BLOCK.get(new Identifier(PCMain.MOD_ID, multiBlockEnum.getName(entry.getValue())));
-            if(newBlock == null) {
-                //System.out.println("CANT FIND THE BLOCK");
-                return;
-            }
+            if(newBlock == null) return;
             if(world.isAir(entry.getKey())) world.setBlockState(entry.getKey(), newBlock.getDefaultState().with(HorizontalFacingBlock.FACING, facing));
 
         }

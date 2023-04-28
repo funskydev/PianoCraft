@@ -3,12 +3,14 @@ package funskydev.pianocraft.block;
 import funskydev.pianocraft.PCMain;
 import funskydev.pianocraft.util.BlockPosEnum;
 import funskydev.pianocraft.util.MultiblockUtil;
+import funskydev.pianocraft.util.VoxelShapeUtil;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.minecraft.block.*;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
 import net.minecraft.state.StateManager;
+import net.minecraft.text.MutableText;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.shape.VoxelShape;
@@ -18,17 +20,24 @@ import net.minecraft.world.WorldAccess;
 
 public class MultiblockPartBlock extends HorizontalFacingBlock {
 
-    private BlockPosEnum multiblockPos;
+    private BlockPosEnum multiblockPartPos;
     private MultiblockMainPart mainBlock;
-    private VoxelShape bounding;
 
-    public MultiblockPartBlock(BlockPosEnum pos, MultiblockMainPart mainBlock, VoxelShape bounding) {
+    private final VoxelShape northShape;
+    private final VoxelShape eastShape;
+    private final VoxelShape southShape;
+    private final VoxelShape westShape;
+
+    public MultiblockPartBlock(BlockPosEnum pos, MultiblockMainPart mainBlock, VoxelShape shape) {
 
         super(FabricBlockSettings.copyOf(mainBlock).dropsNothing().nonOpaque().noBlockBreakParticles());
 
-        this.multiblockPos = pos;
+        this.multiblockPartPos = pos;
         this.mainBlock = mainBlock;
-        this.bounding = bounding;
+        this.northShape = shape;
+        this.eastShape = VoxelShapeUtil.rotateBoundingBox(northShape, Direction.EAST);
+        this.southShape = VoxelShapeUtil.rotateBoundingBox(northShape, Direction.SOUTH);
+        this.westShape = VoxelShapeUtil.rotateBoundingBox(northShape, Direction.WEST);
 
     }
 
@@ -39,6 +48,22 @@ public class MultiblockPartBlock extends HorizontalFacingBlock {
         if (!state.isOf(newState.getBlock())) {
             destroyMultiblock(world, pos, state);
         }
+    }
+
+    @Override
+    public VoxelShape getOutlineShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
+
+        switch (state.get(FACING)) {
+            case EAST:
+                return eastShape;
+            case SOUTH:
+                return southShape;
+            case WEST:
+                return westShape;
+            default:
+                return northShape;
+        }
+
     }
 
     @Override
@@ -59,6 +84,21 @@ public class MultiblockPartBlock extends HorizontalFacingBlock {
     @Override
     public ItemStack getPickStack(BlockView world, BlockPos pos, BlockState state) {
         return new ItemStack(mainBlock);
+    }
+
+    @Override
+    public MutableText getName() {
+        return mainBlock.getName();
+    }
+
+    @Override
+    public void onBlockBreakStart(BlockState state, World world, BlockPos pos, PlayerEntity player) {
+        super.onBlockBreakStart(state, world, pos, player);
+    }
+
+    @Override
+    public void onBreak(World world, BlockPos pos, BlockState state, PlayerEntity player) {
+        super.onBreak(world, pos, state, player);
     }
 
     @Override
@@ -83,10 +123,14 @@ public class MultiblockPartBlock extends HorizontalFacingBlock {
     public void destroyMultiblock(World world, BlockPos pos, BlockState state) {
 
         Direction facing = state.get(FACING);
-        BlockPos targetPos = MultiblockUtil.getMainBlock(pos, multiblockPos, facing);
+        BlockPos targetPos = MultiblockUtil.getMainBlock(pos, multiblockPartPos, facing);
 
         if(world.getBlockState(targetPos).isOf(mainBlock)) mainBlock.destroyMultiblockParts(world, targetPos, state);
 
+    }
+
+    public BlockPosEnum getMultiblockPartPos() {
+        return multiblockPartPos;
     }
 
 }

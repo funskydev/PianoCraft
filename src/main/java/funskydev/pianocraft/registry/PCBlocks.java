@@ -9,7 +9,6 @@ import funskydev.pianocraft.util.BlockPosEnum;
 import funskydev.pianocraft.util.MultiblockEnum;
 import net.fabricmc.fabric.api.item.v1.FabricItemSettings;
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
-import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.minecraft.block.Block;
 import net.minecraft.block.ShapeContext;
 import net.minecraft.item.*;
@@ -18,22 +17,29 @@ import net.minecraft.registry.Registry;
 import net.minecraft.util.Identifier;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class PCBlocks {
 
-    public static final Block PIANO = registerMultiblockWithItem("piano", new PianoBlock());
+    public static final MultiblockMainPart PIANO = registerMultiblockWithItem("piano", new PianoBlock());
 
-    public static List<Block> MULTIBLOCKS = new ArrayList<Block>();
+    public static Map<MultiblockPartBlock, MultiblockMainPart> MULTIBLOCKS = new HashMap<>();
 
     public static void registerMultiblocks() {
 
         for(MultiblockEnum multiblock : MultiblockEnum.values()) {
 
-            for(BlockPosEnum pos : multiblock.getBlocksPos()) {
+            for(BlockPosEnum pos : multiblock.getBlocksPosList()) {
 
-                Block mbpBlock = new MultiblockPartBlock(pos, multiblock.getMainBlock(), multiblock.getMainBlock().getOutlineShape(multiblock.getMainBlock().getDefaultState(), null, null, ShapeContext.absent()));
-                MULTIBLOCKS.add(registerBlock(multiblock.getName(pos), mbpBlock, false));
+                MultiblockMainPart mainBlock = multiblock.getMainBlock();
+
+                // if the main block is null, skip registering the multiblock
+                if (mainBlock == null) break;
+
+                MultiblockPartBlock mbpBlock = new MultiblockPartBlock(pos, mainBlock, multiblock.getShapeForBlock(pos));
+                MULTIBLOCKS.put(registerBlock(multiblock.getName(pos), mbpBlock, false), mainBlock);
 
             }
 

@@ -21,18 +21,11 @@ public class PCModelGen extends FabricModelProvider {
     @Override
     public void generateBlockStateModels(BlockStateModelGenerator blockStateModelGen) {
 
-        //blockStateModelGen.registerNorthDefaultHorizontalRotated(PCBlocks.PIANO, null);
-
-
         blockStateModelGen.blockStateCollector.accept(
                 VariantsBlockStateSupplier.create(
                         PCBlocks.PIANO,
                         BlockStateVariant.create().put(VariantSettings.MODEL, new Identifier(PCMain.MOD_ID, "block/piano"))
                 ).coordinate(BlockStateModelGenerator.createNorthDefaultHorizontalRotationStates()));
-
-        //blockStateModelGen.registerNorthDefaultHorizontalRotated();
-
-        //blockStateModelGen.blockStateCollector.accept(VariantsBlockStateSupplier.create());
 
     }
 

@@ -30,6 +30,8 @@ loom {
             runDir "build/datagen"
         }
     }
+
+	accessWidenerPath = file("src/main/resources/pianocraft.accesswidener")
 }
 
 // Add the generated resources to the main source set

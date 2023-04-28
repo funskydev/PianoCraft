@@ -21,7 +21,7 @@ public class PianoBlock extends MultiblockMainPart {
 
     public PianoBlock() {
 
-        super(MultiblockSettings.of(Material.WOOD).strength(4.0f).nonOpaque().sounds(BlockSoundGroup.WOOD), MultiblockEnum.PIANO);
+        super(MultiblockSettings.of(Material.WOOD).strength(1.0f, 3.0f).nonOpaque().sounds(BlockSoundGroup.WOOD), MultiblockEnum.PIANO);
 
     }
 

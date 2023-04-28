@@ -28,6 +28,7 @@
 	"mixins": [
 		"pianocraft.mixins.json"
 	],
+	"accessWidener": "pianocraft.accesswidener",
 	"depends": {
 		"fabricloader": ">=0.14.19",
 		"minecraft": "~1.19.4",
