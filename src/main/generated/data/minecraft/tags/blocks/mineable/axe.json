@@ -4,8 +4,8 @@
     "pianocraft:piano",
     "pianocraft:piano_mult_west",
     "pianocraft:piano_mult_top",
-    "pianocraft:piano_mult_top_east",
     "pianocraft:piano_mult_east",
-    "pianocraft:piano_mult_top_west"
+    "pianocraft:piano_mult_top_west",
+    "pianocraft:piano_mult_top_east"
   ]
 }
