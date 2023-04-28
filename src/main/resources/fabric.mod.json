@@ -18,6 +18,9 @@
 		"main": [
 			"funskydev.pianocraft.PCMain"
 		],
+		"client": [
+			"funskydev.pianocraft.client.PCMainClient"
+		],
 		"fabric-datagen": [
 			"funskydev.pianocraft.datagen.PCDataGen"
 		]

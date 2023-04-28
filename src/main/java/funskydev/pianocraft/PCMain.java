@@ -1,6 +1,7 @@
 package funskydev.pianocraft;
 
 import funskydev.pianocraft.registry.PCBlocks;
+import funskydev.pianocraft.registry.PCItems;
 import net.fabricmc.api.ModInitializer;
 
 import org.slf4j.Logger;
@@ -17,6 +18,7 @@ public class PCMain implements ModInitializer {
         LOGGER.info("PianoCraft is initializing");
 
         PCBlocks.registerBlocks();
+        PCItems.registerItems();
 
         LOGGER.info("PianoCraft has been initialized");
 

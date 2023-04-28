@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=east": {
+      "model": "pianocraft:block/piano",
+      "y": 90
+    },
+    "facing=north": {
+      "model": "pianocraft:block/piano"
+    },
+    "facing=south": {
+      "model": "pianocraft:block/piano",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "pianocraft:block/piano",
+      "y": 270
+    }
+  }
+}
