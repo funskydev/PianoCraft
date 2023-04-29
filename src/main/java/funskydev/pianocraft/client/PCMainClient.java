@@ -2,7 +2,10 @@ package funskydev.pianocraft.client;
 
 import funskydev.pianocraft.PCMain;
 import funskydev.pianocraft.client.midi.MidiInputReceiver;
+import funskydev.pianocraft.registry.PCScreenHandlers;
+import funskydev.pianocraft.client.screen.PianoScreen;
 import net.fabricmc.api.ClientModInitializer;
+import net.minecraft.client.gui.screen.ingame.HandledScreens;
 
 import javax.sound.midi.*;
 
@@ -28,6 +31,8 @@ public class PCMainClient implements ClientModInitializer {
         } catch (MidiUnavailableException e) {
             PCMain.LOGGER.error(e.getMessage());
         }
+
+        HandledScreens.register(PCScreenHandlers.PIANO_SCREEN_HANDLER, PianoScreen::new);
 
     }
 

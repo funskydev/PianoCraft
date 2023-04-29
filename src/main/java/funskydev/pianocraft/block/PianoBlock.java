@@ -1,5 +1,6 @@
 package funskydev.pianocraft.block;
 
+import funskydev.pianocraft.screen.PianoScreenHandler;
 import funskydev.pianocraft.util.MultiblockEnum;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.minecraft.block.Block;
@@ -8,21 +9,28 @@ import net.minecraft.block.HorizontalFacingBlock;
 import net.minecraft.block.Material;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemPlacementContext;
+import net.minecraft.screen.CraftingScreenHandler;
+import net.minecraft.screen.NamedScreenHandlerFactory;
+import net.minecraft.screen.ScreenHandlerContext;
+import net.minecraft.screen.SimpleNamedScreenHandlerFactory;
 import net.minecraft.sound.BlockSoundGroup;
+import net.minecraft.stat.Stats;
 import net.minecraft.state.StateManager;
+import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
+import org.jetbrains.annotations.Nullable;
 
 public class PianoBlock extends MultiblockMainPart {
 
+    private static Text TITLE = Text.translatable("container.pianocraft.piano");
+
     public PianoBlock() {
-
         super(MultiblockSettings.of(Material.WOOD).strength(1.0f, 3.0f).nonOpaque().sounds(BlockSoundGroup.WOOD), MultiblockEnum.PIANO);
-
     }
 
     @Override
@@ -31,8 +39,28 @@ public class PianoBlock extends MultiblockMainPart {
     }
 
     @Override
-    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
-        return super.onUse(state, world, pos, player, hand, hit);
+    public float getAmbientOcclusionLightLevel(BlockState state, BlockView world, BlockPos pos) {
+        return 1.0f;
     }
 
+    @Override
+    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
+        if (world.isClient) {
+            return ActionResult.SUCCESS;
+        }
+        player.openHandledScreen(state.createScreenHandlerFactory(world, pos));
+        // piano stat ?
+        return ActionResult.CONSUME;
+    }
+
+    @Nullable
+    @Override
+    public NamedScreenHandlerFactory createScreenHandlerFactory(BlockState state, World world, BlockPos pos) {
+        return new SimpleNamedScreenHandlerFactory(
+                ((syncId, inventory, player) -> {
+                    return new PianoScreenHandler(syncId, inventory);
+                }),
+                TITLE
+        );
+    }
 }
