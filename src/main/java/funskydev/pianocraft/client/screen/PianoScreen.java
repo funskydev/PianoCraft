@@ -4,6 +4,7 @@ import com.google.common.collect.Lists;
 import funskydev.pianocraft.PCMain;
 import funskydev.pianocraft.client.screen.widgets.PianoKeyWidget;
 import funskydev.pianocraft.screen.PianoScreenHandler;
+import funskydev.pianocraft.util.NoteUtil;
 import funskydev.pianocraft.util.NotesEnum;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.gui.screen.narration.NarrationMessageBuilder;
@@ -51,10 +52,6 @@ public class PianoScreen extends HandledScreen<PianoScreenHandler> {
         this.buttons.add(button);
     }
 
-    private void sendButtonPressPacket(int id) {
-        this.client.interactionManager.clickButton(this.handler.syncId, id);
-    }
-
     @Override
     protected void init() {
         super.init();
@@ -66,7 +63,7 @@ public class PianoScreen extends HandledScreen<PianoScreenHandler> {
 
         }
 
-        this.addButton(new PressableWidget(this.titleX, this.titleY, 40, 40, Text.of("test")) {
+        /*this.addButton(new PressableWidget(this.titleX, this.titleY, 40, 40, Text.of("test")) {
             @Override
             protected void appendClickableNarrations(NarrationMessageBuilder builder) {
 
@@ -78,7 +75,7 @@ public class PianoScreen extends HandledScreen<PianoScreenHandler> {
 
                 sendButtonPressPacket(0);
             }
-        });
+        });*/
     }
 
     @Override
@@ -96,7 +93,6 @@ public class PianoScreen extends HandledScreen<PianoScreenHandler> {
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
 
         InputUtil.Key pressedKey = InputUtil.fromKeyCode(keyCode, scanCode);
-        //PCMain.LOGGER.info("Key = " + pressedKey + ", key.getCategory() = " + pressedKey.getCategory() + ", key.getLocalizedText() = " + pressedKey.getLocalizedText() + ", key.getTranslationKey() = " + pressedKey.getTranslationKey());
 
         if (keyCode == GLFW.GLFW_KEY_ESCAPE) {
             this.close();
@@ -105,19 +101,37 @@ public class PianoScreen extends HandledScreen<PianoScreenHandler> {
 
         for(KeysEnum key : KeysEnum.values()) {
             if (pressedKey.getTranslationKey().equals(key.getTranslationKey())) {
-                PCMain.LOGGER.info("Key found: " + key.getTranslationKey() + ", note: " + key.getNote().getNoteName() + ", octave: " + key.getOctave());
-
-                // Default Minecraft piano sound is tuned to F#4 (id 6 in the NotesEnum and 4th octave)
-                float pitch = (float) (Math.pow(2.0D, (double) (key.getNote().ordinal() - 6) / 12.0D) * Math.pow(2.0D, (double) (key.getOctave() - 4)));
-
-                client.player.playSound(SoundEvents.UI_BUTTON_CLICK.value(), 1.0f, pitch);
-
-                PCMain.LOGGER.info("Pitch: " + pitch);
-
+                playNote(key.getNote(), key.getOctave());
             }
         }
 
         return true;
+    }
+
+    private void playNote(NotesEnum note, int octave) {
+        playNote(note, octave, 1.0f);
+    }
+
+    private void playNote(NotesEnum note, int octave, float volume) {
+        playNoteOnClient(note, octave, volume);
+        sendNoteToServer(note, octave);
+    }
+
+    private void playNoteOnClient(NotesEnum note, int octave, float volume) {
+
+        float pitch = NoteUtil.getPitchFromNoteAndOctave(note, octave);
+        client.player.playSound(SoundEvents.BLOCK_NOTE_BLOCK_HARP.value(), volume, pitch);
+
+        PCMain.LOGGER.info("Note played on client (note: " + note.getNoteName() + ", octave: " + octave + ", pitch: " + pitch + ")");
+
+    }
+
+    private void sendNoteToServer(NotesEnum note, int octave) {
+        sendButtonPressPacket(NoteUtil.convertNoteAndOctaveToId(note, octave));
+    }
+
+    private void sendButtonPressPacket(int id) {
+        this.client.interactionManager.clickButton(this.handler.syncId, id);
     }
 
 }
