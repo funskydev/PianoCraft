@@ -2,10 +2,12 @@ package funskydev.pianocraft.client.screen;
 
 import com.google.common.collect.Lists;
 import funskydev.pianocraft.PCMain;
+import funskydev.pianocraft.client.PCMainClient;
 import funskydev.pianocraft.client.screen.widgets.PianoKeyWidget;
 import funskydev.pianocraft.screen.PianoScreenHandler;
 import funskydev.pianocraft.util.NoteUtil;
 import funskydev.pianocraft.util.NotesEnum;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.gui.screen.narration.NarrationMessageBuilder;
 import net.minecraft.client.gui.widget.ClickableWidget;
@@ -28,6 +30,8 @@ public class PianoScreen extends HandledScreen<PianoScreenHandler> {
     static final Identifier TEXTURE = new Identifier(PCMain.MOD_ID, "textures/gui/piano.png");
 
     private final List<ClickableWidget> buttons = Lists.newArrayList();
+
+    private PressableWidget midiDeviceButton;
 
     public PianoScreen(PianoScreenHandler handler, PlayerInventory inventory, Text title) {
         super(handler, inventory, title);
@@ -55,7 +59,7 @@ public class PianoScreen extends HandledScreen<PianoScreenHandler> {
     @Override
     protected void init() {
         super.init();
-        this.buttons.clear();
+        /*this.buttons.clear();
 
         for (NotesEnum note : NotesEnum.values()) {
 
@@ -63,7 +67,7 @@ public class PianoScreen extends HandledScreen<PianoScreenHandler> {
 
         }
 
-        /*this.addButton(new PressableWidget(this.titleX, this.titleY, 40, 40, Text.of("test")) {
+        this.addButton(new PressableWidget(this.titleX, this.titleY, 40, 40, Text.of(PCMainClient.getCurrentMidiDevice().getDeviceInfo().getName())) {
             @Override
             protected void appendClickableNarrations(NarrationMessageBuilder builder) {
 
@@ -72,10 +76,27 @@ public class PianoScreen extends HandledScreen<PianoScreenHandler> {
             @Override
             public void onPress() {
                 PCMain.LOGGER.info("Button pressed");
-
-                sendButtonPressPacket(0);
+                this.setMessage(Text.of("Button pressed"));
             }
         });*/
+
+        this.midiDeviceButton = new PressableWidget(10, 10, 120, 20, Text.of("Unknown")) {
+            @Override
+            protected void appendClickableNarrations(NarrationMessageBuilder builder) {
+
+            }
+
+            @Override
+            public void onPress() {
+                midiDeviceButtonPressed();
+            }
+        };
+
+        this.addDrawableChild(this.midiDeviceButton);
+
+        PCMainClient.ensureCurrentMidiDeviceIsAvailableOrSetToDefault();
+        updateMidiDeviceButtonText();
+
     }
 
     @Override
@@ -108,11 +129,11 @@ public class PianoScreen extends HandledScreen<PianoScreenHandler> {
         return true;
     }
 
-    private void playNote(NotesEnum note, int octave) {
+    public void playNote(NotesEnum note, int octave) {
         playNote(note, octave, 1.0f);
     }
 
-    private void playNote(NotesEnum note, int octave, float volume) {
+    public void playNote(NotesEnum note, int octave, float volume) {
         playNoteOnClient(note, octave, volume);
         sendNoteToServer(note, octave);
     }
@@ -132,6 +153,21 @@ public class PianoScreen extends HandledScreen<PianoScreenHandler> {
 
     private void sendButtonPressPacket(int id) {
         this.client.interactionManager.clickButton(this.handler.syncId, id);
+    }
+
+    private void midiDeviceButtonPressed() {
+        //boolean available = PCMainClient.isCurrentMidiDeviceAvailable();
+        //PCMain.LOGGER.info("Midi device button pressed (available: " + available + ")");
+        PCMainClient.selectNextMidiDevice();
+        updateMidiDeviceButtonText();
+    }
+
+    /*public void setMidiDeviceButtonText(String text) {
+        this.midiDeviceButton.setMessage(Text.of(text));
+    }*/
+
+    private void updateMidiDeviceButtonText() {
+        this.midiDeviceButton.setMessage(Text.of(PCMainClient.getCurrentMidiDeviceName()));
     }
 
 }
