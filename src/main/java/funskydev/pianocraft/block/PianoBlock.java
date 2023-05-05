@@ -1,7 +1,10 @@
 package funskydev.pianocraft.block;
 
+import funskydev.pianocraft.PCMain;
 import funskydev.pianocraft.screen.PianoScreenHandler;
+import funskydev.pianocraft.util.BlockPosEnum;
 import funskydev.pianocraft.util.MultiblockEnum;
+import funskydev.pianocraft.util.MultiblockUtil;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -21,6 +24,7 @@ import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Direction;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
@@ -45,12 +49,36 @@ public class PianoBlock extends MultiblockMainPart {
 
     @Override
     public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
-        if (world.isClient) {
-            return ActionResult.SUCCESS;
+
+        BlockState mainBlockState = state;
+        BlockPos mainBlockPos = pos;
+
+        // If the block is a part of a multiblock, get the main block state and position
+        if (state.getBlock() instanceof MultiblockPartBlock multiblockPart) {
+
+            BlockPosEnum multiblockPartPos = multiblockPart.getMultiblockPartPos();
+
+            if (multiblockPartPos.isTop()) return ActionResult.PASS;
+
+            mainBlockPos = MultiblockUtil.getMainBlock(pos, multiblockPartPos, state.get(FACING));
+            mainBlockState = world.getBlockState(mainBlockPos);
+
         }
-        player.openHandledScreen(state.createScreenHandlerFactory(world, pos));
-        // piano stat ?
-        return ActionResult.CONSUME;
+
+        if (hit.getSide() == mainBlockState.get(FACING) || hit.getSide() == Direction.UP) {
+
+            if (world.isClient) {
+                return ActionResult.SUCCESS;
+            }
+
+            player.openHandledScreen(mainBlockState.createScreenHandlerFactory(world, mainBlockPos));
+            // piano stat ?
+            return ActionResult.CONSUME;
+
+        }
+
+        return ActionResult.PASS;
+
     }
 
     @Nullable

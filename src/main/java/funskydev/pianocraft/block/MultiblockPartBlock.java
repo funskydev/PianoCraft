@@ -11,6 +11,9 @@ import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
 import net.minecraft.state.StateManager;
 import net.minecraft.text.MutableText;
+import net.minecraft.util.ActionResult;
+import net.minecraft.util.Hand;
+import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.shape.VoxelShape;
@@ -41,6 +44,13 @@ public class MultiblockPartBlock extends HorizontalFacingBlock {
 
     }
 
+    // Behaviors
+    
+    @Override
+    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
+        return mainBlock.onUse(state, world, pos, player, hand, hit);
+    }
+
     @Override
     public void onStateReplaced(BlockState state, World world, BlockPos pos, BlockState newState, boolean moved) {
         super.onStateReplaced(state, world, pos, newState, moved);
@@ -65,6 +75,8 @@ public class MultiblockPartBlock extends HorizontalFacingBlock {
         }
 
     }
+
+    // Rendering
 
     @Override
     public boolean isTransparent(BlockState state, BlockView world, BlockPos pos) {
@@ -110,6 +122,8 @@ public class MultiblockPartBlock extends HorizontalFacingBlock {
         return super.getStateForNeighborUpdate(state, direction, neighborState, world, pos, neighborPos);
     }
 
+    // Facing
+
     @Override
     public BlockState getPlacementState(ItemPlacementContext ctx) {
         return (BlockState)this.getDefaultState().with(FACING, ctx.getHorizontalPlayerFacing().getOpposite());
@@ -119,6 +133,8 @@ public class MultiblockPartBlock extends HorizontalFacingBlock {
     protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
         builder.add(FACING);
     }
+
+    // Multiblock part methods
 
     public void destroyMultiblock(World world, BlockPos pos, BlockState state) {
 
