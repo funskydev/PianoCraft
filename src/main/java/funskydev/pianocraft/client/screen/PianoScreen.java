@@ -25,6 +25,7 @@ import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.ScreenHandlerListener;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
+import net.minecraft.util.Hand;
 import net.minecraft.util.Identifier;
 import org.lwjgl.glfw.GLFW;
 
@@ -156,8 +157,7 @@ public class PianoScreen extends HandledScreen<PianoScreenHandler> {
 
         float pitch = NoteUtil.getPitchFromNoteAndOctave(note, octave);
         client.player.playSound(SoundEvents.BLOCK_NOTE_BLOCK_HARP.value(), volume, pitch);
-
-        PCMain.LOGGER.info("Note played on client (note: " + note.getNoteName() + ", octave: " + octave + ", pitch: " + pitch + ")");
+        client.player.swingHand(Hand.values()[client.player.getRandom().nextInt(Hand.values().length)]);
 
     }
 
@@ -170,15 +170,9 @@ public class PianoScreen extends HandledScreen<PianoScreenHandler> {
     }
 
     private void midiDeviceButtonPressed() {
-        //boolean available = PCMainClient.isCurrentMidiDeviceAvailable();
-        //PCMain.LOGGER.info("Midi device button pressed (available: " + available + ")");
         PCMainClient.selectNextMidiDevice();
         updateMidiDeviceButtonText();
     }
-
-    /*public void setMidiDeviceButtonText(String text) {
-        this.midiDeviceButton.setMessage(Text.of(text));
-    }*/
 
     private void updateMidiDeviceButtonText() {
         this.midiDeviceButton.setMessage(Text.of(PCMainClient.getCurrentMidiDeviceName()));

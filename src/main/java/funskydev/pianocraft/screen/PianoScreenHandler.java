@@ -45,8 +45,6 @@ public class PianoScreenHandler extends ScreenHandler {
 
             serverWorld.playSound(player, player.getBlockPos(), SoundEvents.BLOCK_NOTE_BLOCK_HARP.value(), SoundCategory.RECORDS, 1.0f, pitch);
 
-            PCMain.LOGGER.info("Note played on server (note: " + note.getNoteName() + ", octave: " + octave + ", pitch: " + pitch + ")");
-
             return true;
         }
 

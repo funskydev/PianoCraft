@@ -10,6 +10,8 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.HorizontalFacingBlock;
 import net.minecraft.block.Material;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.screen.CraftingScreenHandler;
@@ -68,6 +70,7 @@ public class PianoBlock extends MultiblockMainPart {
         if (hit.getSide() == mainBlockState.get(FACING) || hit.getSide() == Direction.UP) {
 
             if (world.isClient) {
+                MinecraftClient.getInstance().gameRenderer.firstPersonRenderer.resetEquipProgress(Hand.OFF_HAND);
                 return ActionResult.SUCCESS;
             }
 
