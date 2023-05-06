@@ -63,7 +63,11 @@ public enum KeysEnum {
     }
 
     public static KeysEnum fromNoteAndOctave(NotesEnum note, int octave) {
-        return KeysEnum.values()[note.ordinal() + (octave - 3) * 12];
+        try {
+            return KeysEnum.values()[note.ordinal() + (octave - 3) * 12];
+        } catch (ArrayIndexOutOfBoundsException e) {
+            return null;
+        }
     }
 
 }

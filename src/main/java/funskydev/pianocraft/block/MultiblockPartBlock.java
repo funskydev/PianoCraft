@@ -23,8 +23,8 @@ import net.minecraft.world.WorldAccess;
 
 public class MultiblockPartBlock extends HorizontalFacingBlock {
 
-    private BlockPosEnum multiblockPartPos;
-    private MultiblockMainPart mainBlock;
+    private final BlockPosEnum multiblockPartPos;
+    private final MultiblockMainPart mainBlock;
 
     private final VoxelShape northShape;
     private final VoxelShape eastShape;

@@ -145,8 +145,11 @@ public class PCMainClient implements ClientModInitializer {
                     // Check if the device has at least one transmitter
                     if (device.getMaxTransmitters() != 0) {
 
-                        device.open();
-                        device.close();
+                        // Test if the device isn't already opened
+                        if (!device.isOpen()) {
+                            device.open();
+                            device.close();
+                        }
 
                         devices.add(device);
                     }
