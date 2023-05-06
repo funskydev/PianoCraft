@@ -10,7 +10,7 @@
 	"contact": {
 		"sources": "https://github.com/funskydev/PianoCraft"
 	},
-	"license": "LGPL-3.0",
+	"license": "LGPL-2.1",
 	"icon": "assets/pianocraft/icon.png",
 	"environment": "*",
 	"entrypoints": {
