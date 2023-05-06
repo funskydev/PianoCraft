@@ -3,15 +3,14 @@
 	"id": "pianocraft",
 	"version": "${version}",
 	"name": "PianoCraft",
-	"description": "This is an example description! Tell everyone what your mod is about!",
+	"description": "PianoCraft is a mod that adds a playable piano to the game, allowing players to create their own musical compositions within Minecraft.",
 	"authors": [
 		"FunskyDev"
 	],
 	"contact": {
-		"homepage": "https://fabricmc.net/",
-		"sources": "https://github.com/FabricMC/fabric-example-mod"
+		"sources": "https://github.com/funskydev/PianoCraft"
 	},
-	"license": "CC0-1.0",
+	"license": "LGPL-3.0",
 	"icon": "assets/pianocraft/icon.png",
 	"environment": "*",
 	"entrypoints": {
