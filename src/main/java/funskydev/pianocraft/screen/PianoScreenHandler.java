@@ -17,21 +17,27 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
+import net.minecraft.util.math.BlockPos;
 import org.jetbrains.annotations.Nullable;
 
 public class PianoScreenHandler extends ScreenHandler {
 
     private final Inventory inventory;
+    private BlockPos pos;
 
-    public PianoScreenHandler(int syncId) {
+    /*public PianoScreenHandler(int syncId) {
         this(syncId, new SimpleInventory(1));
-    }
+    }*/
 
     public PianoScreenHandler(int syncId, Inventory inventory) {
-
         super(PCScreenHandlers.PIANO_SCREEN_HANDLER, syncId);
         this.inventory = inventory;
+    }
 
+    public PianoScreenHandler(int syncId, Inventory inventory, BlockPos pos) {
+        super(PCScreenHandlers.PIANO_SCREEN_HANDLER, syncId);
+        this.inventory = inventory;
+        this.pos = pos;
     }
 
     @Override
@@ -63,6 +69,10 @@ public class PianoScreenHandler extends ScreenHandler {
 
     public ItemStack getSoundItemStack() {
         return this.inventory.getStack(0);
+    }
+
+    public BlockPos getPianoPos() {
+        return this.pos;
     }
 
 }

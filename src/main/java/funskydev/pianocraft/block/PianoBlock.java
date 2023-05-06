@@ -89,7 +89,7 @@ public class PianoBlock extends MultiblockMainPart {
     public NamedScreenHandlerFactory createScreenHandlerFactory(BlockState state, World world, BlockPos pos) {
         return new SimpleNamedScreenHandlerFactory(
                 ((syncId, inventory, player) -> {
-                    return new PianoScreenHandler(syncId, inventory);
+                    return new PianoScreenHandler(syncId, inventory, pos);
                 }),
                 TITLE
         );

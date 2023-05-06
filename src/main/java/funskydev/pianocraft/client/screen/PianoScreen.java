@@ -5,9 +5,12 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import funskydev.pianocraft.PCMain;
 import funskydev.pianocraft.client.PCMainClient;
 import funskydev.pianocraft.client.screen.widgets.PianoKeyWidget;
+import funskydev.pianocraft.network.PCPackets;
 import funskydev.pianocraft.screen.PianoScreenHandler;
 import funskydev.pianocraft.util.NoteUtil;
 import funskydev.pianocraft.util.NotesEnum;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
+import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.gui.screen.ingame.BeaconScreen;
@@ -21,12 +24,14 @@ import net.minecraft.client.util.InputUtil;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
+import net.minecraft.network.PacketByteBuf;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.ScreenHandlerListener;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
 import net.minecraft.util.Hand;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.math.BlockPos;
 import org.lwjgl.glfw.GLFW;
 
 import java.util.List;
@@ -39,20 +44,6 @@ public class PianoScreen extends HandledScreen<PianoScreenHandler> {
 
     public PianoScreen(PianoScreenHandler handler, PlayerInventory inventory, Text title) {
         super(handler, inventory, title);
-        //this.backgroundWidth = 25;
-        //this.backgroundHeight = 219;
-
-        handler.addListener(new ScreenHandlerListener() {
-            @Override
-            public void onSlotUpdate(ScreenHandler handler, int slotId, ItemStack stack) {
-                PCMain.LOGGER.info("Slot updated (slotId: " + slotId + ")");
-            }
-
-            @Override
-            public void onPropertyUpdate(ScreenHandler handler, int property, int value) {
-                PCMain.LOGGER.info("Property updated (property: " + property + ", value: " + value + ")");
-            }
-        });
     }
 
     @Override
@@ -60,8 +51,7 @@ public class PianoScreen extends HandledScreen<PianoScreenHandler> {
         super.init();
 
         this.addDrawableChild(new TextWidget(10, 10, 120, 0, Text.of("Piano"), this.textRenderer));
-        PCMain.LOGGER.info("width: " + this.width + ", height: " + this.height);
-        PCMain.LOGGER.info("backgroundWidth: " + this.backgroundWidth + ", backgroundHeight: " + this.backgroundHeight);
+
         this.midiDeviceButton = new PressableWidget(10, 20, 120, 20, Text.of("Unknown")) {
             @Override
             protected void appendClickableNarrations(NarrationMessageBuilder builder) {
@@ -113,16 +103,12 @@ public class PianoScreen extends HandledScreen<PianoScreenHandler> {
     @Override
     protected void drawBackground(MatrixStack matrices, float delta, int mouseX, int mouseY) {
         RenderSystem.setShaderTexture(0, TEXTURE);
-        int x = (this.width - this.backgroundWidth) / 2;
-        int j = (this.height - this.backgroundHeight) / 2;
-        //BeaconScreen.drawTexture(matrices, i, 0, 0, 0, 300, 100);
         DrawableHelper.drawTexture(matrices, 6, 45, 0, 0, 0, 128, 64, 128, 64);
     }
 
     @Override
     protected void drawForeground(MatrixStack matrices, int mouseX, int mouseY) {
-        //super.drawForeground(matrices, mouseX, mouseY);
-        //this.textRenderer.draw(matrices, Text.of("Piano"), 0, 0, 0xffffff);
+
     }
 
     @Override
@@ -150,7 +136,7 @@ public class PianoScreen extends HandledScreen<PianoScreenHandler> {
 
     public void playNote(NotesEnum note, int octave, float volume) {
         playNoteOnClient(note, octave, volume);
-        sendNoteToServer(note, octave);
+        sendNoteToServer(note, octave, volume);
     }
 
     private void playNoteOnClient(NotesEnum note, int octave, float volume) {
@@ -161,8 +147,15 @@ public class PianoScreen extends HandledScreen<PianoScreenHandler> {
 
     }
 
-    private void sendNoteToServer(NotesEnum note, int octave) {
-        sendButtonPressPacket(NoteUtil.convertNoteAndOctaveToId(note, octave));
+    private void sendNoteToServer(NotesEnum note, int octave, float volume) {
+        //sendButtonPressPacket(NoteUtil.convertNoteAndOctaveToId(note, octave));
+
+        PacketByteBuf buf = PacketByteBufs.create();
+        buf.writeInt(note.ordinal());
+        buf.writeInt(octave);
+        buf.writeFloat(volume);
+
+        ClientPlayNetworking.send(PCPackets.KEY_PRESSED_PACKET_ID, buf);
     }
 
     private void sendButtonPressPacket(int id) {
@@ -175,7 +168,18 @@ public class PianoScreen extends HandledScreen<PianoScreenHandler> {
     }
 
     private void updateMidiDeviceButtonText() {
-        this.midiDeviceButton.setMessage(Text.of(PCMainClient.getCurrentMidiDeviceName()));
+
+        String currentMidiDeviceName = PCMainClient.getCurrentMidiDeviceName();
+        String tooltipText = "Click to switch to the next MIDI device";
+
+        if (currentMidiDeviceName == null) {
+            currentMidiDeviceName = "No MIDI device found";
+            tooltipText = "Click to refresh MIDI devices";
+        }
+
+        this.midiDeviceButton.setMessage(Text.of(currentMidiDeviceName));
+        this.midiDeviceButton.setTooltip(Tooltip.of(Text.of(tooltipText)));
+
     }
 
 }
