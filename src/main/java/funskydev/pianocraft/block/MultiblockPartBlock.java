@@ -113,15 +113,6 @@ public class MultiblockPartBlock extends HorizontalFacingBlock {
         super.onBreak(world, pos, state, player);
     }
 
-    @Override
-    public BlockState getStateForNeighborUpdate(BlockState state, Direction direction, BlockState neighborState, WorldAccess world, BlockPos pos, BlockPos neighborPos) {
-        PCMain.LOGGER.info("MultiblockPartBlock.getStateForNeighborUpdate()");
-        PCMain.LOGGER.info("direction: " + direction);
-        PCMain.LOGGER.info("neighborState: " + neighborState.getBlock().getName().getString());
-
-        return super.getStateForNeighborUpdate(state, direction, neighborState, world, pos, neighborPos);
-    }
-
     // Facing
 
     @Override

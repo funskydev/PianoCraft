@@ -42,15 +42,7 @@ public abstract class MultiblockMainPartBlock extends HorizontalFacingBlock {
 
     }
 
-    @Override
-    public BlockState getPlacementState(ItemPlacementContext ctx) {
-        return this.getDefaultState().with(FACING, ctx.getHorizontalPlayerFacing().getOpposite());
-    }
-
-    @Override
-    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
-        builder.add(FACING);
-    }
+    // Behaviors
 
     @Override
     public void onPlaced(World world, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack itemStack) {
@@ -81,6 +73,20 @@ public abstract class MultiblockMainPartBlock extends HorizontalFacingBlock {
         }
 
     }
+
+    // Facing
+
+    @Override
+    public BlockState getPlacementState(ItemPlacementContext ctx) {
+        return this.getDefaultState().with(FACING, ctx.getHorizontalPlayerFacing().getOpposite());
+    }
+
+    @Override
+    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
+        builder.add(FACING);
+    }
+
+    // Multiblock main part methods
 
     public void placeMultiblockParts(World world, BlockPos pos, BlockState state) {
 

@@ -1,6 +1,6 @@
 package funskydev.pianocraft.registry;
 
-import funskydev.pianocraft.MultiblockItem;
+import funskydev.pianocraft.item.MultiblockItem;
 import funskydev.pianocraft.PCMain;
 import funskydev.pianocraft.block.MultiblockMainPartBlock;
 import funskydev.pianocraft.block.MultiblockPartBlock;

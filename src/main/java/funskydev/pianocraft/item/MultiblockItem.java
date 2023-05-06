@@ -1,4 +1,4 @@
-package funskydev.pianocraft;
+package funskydev.pianocraft.item;
 
 import funskydev.pianocraft.util.MultiblockEnum;
 import funskydev.pianocraft.util.MultiblockUtil;
@@ -21,9 +21,7 @@ public class MultiblockItem extends BlockItem {
     @Override
     protected boolean canPlace(ItemPlacementContext ctx, BlockState state) {
 
-        PCMain.LOGGER.info("MultiblockItem.canPlace() ctx.getBlockPos(): " + ctx.getBlockPos());
-
-        // check for plants etc
+        // TODO: check for plants etc
 
         boolean result = MultiblockUtil.checkAround(ctx.getWorld(), MultiblockUtil.getMultBlocks(ctx.getBlockPos(), ctx.getHorizontalPlayerFacing().getOpposite(), multiblockType));
         return result ? super.canPlace(ctx, state) : false;

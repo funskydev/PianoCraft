@@ -57,7 +57,6 @@ public class PCMainClient implements ClientModInitializer {
 
         List<MidiDevice> devices = getAvailableMidiDevices();
 
-        //if (devices.isEmpty()) setCurrentMidiDevice(null);
         if (!devices.contains(midiDevice)) setCurrentMidiDevice(null);
 
         setCurrentMidiDeviceToDefaultIfNull();
