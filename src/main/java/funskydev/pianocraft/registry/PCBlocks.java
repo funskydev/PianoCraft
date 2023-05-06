@@ -1,28 +1,31 @@
 package funskydev.pianocraft.registry;
 
-import funskydev.pianocraft.item.MultiblockItem;
 import funskydev.pianocraft.PCMain;
 import funskydev.pianocraft.block.MultiblockMainPartBlock;
 import funskydev.pianocraft.block.MultiblockPartBlock;
 import funskydev.pianocraft.block.PianoBlock;
+import funskydev.pianocraft.item.MultiblockItem;
 import funskydev.pianocraft.util.BlockPosEnum;
 import funskydev.pianocraft.util.MultiblockEnum;
 import net.fabricmc.fabric.api.item.v1.FabricItemSettings;
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
 import net.minecraft.block.Block;
-import net.minecraft.item.*;
+import net.minecraft.item.BlockItem;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemGroups;
+import net.minecraft.item.Items;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.util.Identifier;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class PCBlocks {
 
     public static final MultiblockMainPartBlock PIANO = registerMultiblockWithItem("piano", new PianoBlock());
 
-    public static Map<MultiblockPartBlock, MultiblockMainPartBlock> MULTIBLOCKS = new HashMap<>();
+    public static Map<MultiblockPartBlock, MultiblockMainPartBlock> MULTIBLOCKS = new LinkedHashMap<>();
 
     public static void registerMultiblocks() {
 
