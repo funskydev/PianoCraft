@@ -1,4 +1,4 @@
-package funskydev.pianocraft.network;
+package funskydev.pianocraft.registry;
 
 import funskydev.pianocraft.PCMain;
 import net.minecraft.util.Identifier;

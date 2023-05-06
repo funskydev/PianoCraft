@@ -1,7 +1,7 @@
 package funskydev.pianocraft.client.screen.widgets;
 
 import funskydev.pianocraft.PCMain;
-import funskydev.pianocraft.network.PCPackets;
+import funskydev.pianocraft.registry.PCPackets;
 import funskydev.pianocraft.util.NotesEnum;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;

@@ -1,26 +1,16 @@
 package funskydev.pianocraft.block;
 
-import funskydev.pianocraft.PCMain;
 import funskydev.pianocraft.screen.PianoScreenHandler;
 import funskydev.pianocraft.util.BlockPosEnum;
 import funskydev.pianocraft.util.MultiblockEnum;
 import funskydev.pianocraft.util.MultiblockUtil;
-import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
-import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
-import net.minecraft.block.HorizontalFacingBlock;
 import net.minecraft.block.Material;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemPlacementContext;
-import net.minecraft.screen.CraftingScreenHandler;
 import net.minecraft.screen.NamedScreenHandlerFactory;
-import net.minecraft.screen.ScreenHandlerContext;
 import net.minecraft.screen.SimpleNamedScreenHandlerFactory;
 import net.minecraft.sound.BlockSoundGroup;
-import net.minecraft.stat.Stats;
-import net.minecraft.state.StateManager;
 import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
@@ -31,7 +21,7 @@ import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
-public class PianoBlock extends MultiblockMainPart {
+public class PianoBlock extends MultiblockMainPartBlock {
 
     private static Text TITLE = Text.translatable("container.pianocraft.piano");
 

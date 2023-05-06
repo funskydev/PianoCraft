@@ -3,7 +3,7 @@ package funskydev.pianocraft.client.screen;
 import com.mojang.blaze3d.systems.RenderSystem;
 import funskydev.pianocraft.PCMain;
 import funskydev.pianocraft.client.PCMainClient;
-import funskydev.pianocraft.network.PCPackets;
+import funskydev.pianocraft.registry.PCPackets;
 import funskydev.pianocraft.screen.PianoScreenHandler;
 import funskydev.pianocraft.util.NoteUtil;
 import funskydev.pianocraft.util.NotesEnum;
@@ -131,14 +131,18 @@ public class PianoScreen extends HandledScreen<PianoScreenHandler> {
             return true;
         }
 
-        if (keyCode == GLFW.GLFW_KEY_LEFT) {
-            previousOctave();
-            return true;
-        }
+        if (showKeybindings) {
 
-        if (keyCode == GLFW.GLFW_KEY_RIGHT) {
-            nextOctave();
-            return true;
+            if (keyCode == GLFW.GLFW_KEY_LEFT) {
+                previousOctave();
+                return true;
+            }
+
+            if (keyCode == GLFW.GLFW_KEY_RIGHT) {
+                nextOctave();
+                return true;
+            }
+
         }
 
         for(KeysEnum key : KeysEnum.values()) {

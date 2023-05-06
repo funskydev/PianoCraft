@@ -1,6 +1,6 @@
 package funskydev.pianocraft.util;
 
-import funskydev.pianocraft.block.MultiblockMainPart;
+import funskydev.pianocraft.block.MultiblockMainPartBlock;
 import net.minecraft.block.Block;
 import net.minecraft.util.function.BooleanBiFunction;
 import net.minecraft.util.shape.VoxelShape;
@@ -19,7 +19,7 @@ public enum MultiblockEnum {
     }}, VoxelShapes.combineAndSimplify(Block.createCuboidShape(0, 0, 1, 16, 15, 16), Block.createCuboidShape(0, 15, 9, 16, 16, 16), BooleanBiFunction.OR));
 
     private Map<BlockPosEnum, VoxelShape> blocks;
-    private MultiblockMainPart mainBlock;
+    private MultiblockMainPartBlock mainBlock;
     private VoxelShape mainBlockShape = VoxelShapes.fullCube();
 
     MultiblockEnum(LinkedHashMap<BlockPosEnum, VoxelShape> blocks, VoxelShape mainBlockShape) {
@@ -44,7 +44,7 @@ public enum MultiblockEnum {
         return blocks.keySet().stream().toList();
     }
 
-    public MultiblockMainPart getMainBlock() {
+    public MultiblockMainPartBlock getMainBlock() {
         return this.mainBlock;
     }
 
@@ -56,7 +56,7 @@ public enum MultiblockEnum {
         return blocks.get(pos);
     }
 
-    public void setMainBlock(MultiblockMainPart block) {
+    public void setMainBlock(MultiblockMainPartBlock block) {
         this.mainBlock = block;
     }
 

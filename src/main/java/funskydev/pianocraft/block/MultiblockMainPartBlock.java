@@ -19,7 +19,7 @@ import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
-public abstract class MultiblockMainPart extends HorizontalFacingBlock {
+public abstract class MultiblockMainPartBlock extends HorizontalFacingBlock {
 
     private final MultiblockEnum multiblockType;
 
@@ -28,7 +28,7 @@ public abstract class MultiblockMainPart extends HorizontalFacingBlock {
     private final VoxelShape southShape;
     private final VoxelShape westShape;
 
-    protected MultiblockMainPart(FabricBlockSettings settings, MultiblockEnum multiblockType) {
+    protected MultiblockMainPartBlock(FabricBlockSettings settings, MultiblockEnum multiblockType) {
 
         super(settings);
 

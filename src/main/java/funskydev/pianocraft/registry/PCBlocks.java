@@ -2,7 +2,7 @@ package funskydev.pianocraft.registry;
 
 import funskydev.pianocraft.MultiblockItem;
 import funskydev.pianocraft.PCMain;
-import funskydev.pianocraft.block.MultiblockMainPart;
+import funskydev.pianocraft.block.MultiblockMainPartBlock;
 import funskydev.pianocraft.block.MultiblockPartBlock;
 import funskydev.pianocraft.block.PianoBlock;
 import funskydev.pianocraft.util.BlockPosEnum;
@@ -10,22 +10,19 @@ import funskydev.pianocraft.util.MultiblockEnum;
 import net.fabricmc.fabric.api.item.v1.FabricItemSettings;
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
 import net.minecraft.block.Block;
-import net.minecraft.block.ShapeContext;
 import net.minecraft.item.*;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.util.Identifier;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public class PCBlocks {
 
-    public static final MultiblockMainPart PIANO = registerMultiblockWithItem("piano", new PianoBlock());
+    public static final MultiblockMainPartBlock PIANO = registerMultiblockWithItem("piano", new PianoBlock());
 
-    public static Map<MultiblockPartBlock, MultiblockMainPart> MULTIBLOCKS = new HashMap<>();
+    public static Map<MultiblockPartBlock, MultiblockMainPartBlock> MULTIBLOCKS = new HashMap<>();
 
     public static void registerMultiblocks() {
 
@@ -33,7 +30,7 @@ public class PCBlocks {
 
             for(BlockPosEnum pos : multiblock.getBlocksPosList()) {
 
-                MultiblockMainPart mainBlock = multiblock.getMainBlock();
+                MultiblockMainPartBlock mainBlock = multiblock.getMainBlock();
 
                 // if the main block is null, skip registering the multiblock
                 if (mainBlock == null) break;
@@ -67,7 +64,7 @@ public class PCBlocks {
 
     }
 
-    private static <T extends MultiblockMainPart> T registerMultiblockWithItem(String name, T block) {
+    private static <T extends MultiblockMainPartBlock> T registerMultiblockWithItem(String name, T block) {
 
         return registerBlockWithBlockItem(name, block, new MultiblockItem(block, new FabricItemSettings(), block.getMultiblockType()));
 

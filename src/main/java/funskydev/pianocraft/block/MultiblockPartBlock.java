@@ -24,14 +24,14 @@ import net.minecraft.world.WorldAccess;
 public class MultiblockPartBlock extends HorizontalFacingBlock {
 
     private final BlockPosEnum multiblockPartPos;
-    private final MultiblockMainPart mainBlock;
+    private final MultiblockMainPartBlock mainBlock;
 
     private final VoxelShape northShape;
     private final VoxelShape eastShape;
     private final VoxelShape southShape;
     private final VoxelShape westShape;
 
-    public MultiblockPartBlock(BlockPosEnum pos, MultiblockMainPart mainBlock, VoxelShape shape) {
+    public MultiblockPartBlock(BlockPosEnum pos, MultiblockMainPartBlock mainBlock, VoxelShape shape) {
 
         super(FabricBlockSettings.copyOf(mainBlock).dropsNothing().nonOpaque().noBlockBreakParticles());
 

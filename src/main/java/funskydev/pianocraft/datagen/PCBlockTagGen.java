@@ -1,11 +1,10 @@
 package funskydev.pianocraft.datagen;
 
-import funskydev.pianocraft.block.MultiblockMainPart;
+import funskydev.pianocraft.block.MultiblockMainPartBlock;
 import funskydev.pianocraft.block.MultiblockPartBlock;
 import funskydev.pianocraft.registry.PCBlocks;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricTagProvider;
-import net.minecraft.block.Block;
 import net.minecraft.registry.*;
 import net.minecraft.registry.tag.BlockTags;
 
@@ -26,7 +25,7 @@ public class PCBlockTagGen extends FabricTagProvider.BlockTagProvider {
 
     }
 
-    private static void addMultiblockToTag(FabricTagBuilder tag, MultiblockMainPart mainBlock) {
+    private static void addMultiblockToTag(FabricTagBuilder tag, MultiblockMainPartBlock mainBlock) {
 
         tag.add(mainBlock);
 
