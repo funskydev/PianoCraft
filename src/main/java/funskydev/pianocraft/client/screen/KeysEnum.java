@@ -62,4 +62,8 @@ public enum KeysEnum {
         return this.translationKey;
     }
 
+    public static KeysEnum fromNoteAndOctave(NotesEnum note, int octave) {
+        return KeysEnum.values()[note.ordinal() + (octave - 3) * 12];
+    }
+
 }

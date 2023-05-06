@@ -31,7 +31,7 @@ public class PCMainClient implements ClientModInitializer {
     }
 
     public static String getCurrentMidiDeviceName() {
-        return midiDevice == null ? "None" : midiDevice.getDeviceInfo().getName();
+        return midiDevice == null ? "No MIDI device found" : midiDevice.getDeviceInfo().getName();
     }
 
     public static void selectNextMidiDevice() {
