@@ -25,7 +25,7 @@ public class PianoKeyPressedPayloadHandler implements ServerPlayNetworking.PlayP
 
             float pitch = NoteUtil.getPitchFromNoteAndOctave(payload.note(), payload.octave());
 
-            player.getServerWorld().playSound(player, player.getBlockPos(), SoundEvents.BLOCK_NOTE_BLOCK_HARP.value(),
+            player.getServerWorld().playSound(player, pianoPos, SoundEvents.BLOCK_NOTE_BLOCK_HARP.value(),
                     SoundCategory.RECORDS, payload.volume(), pitch);
 
         }

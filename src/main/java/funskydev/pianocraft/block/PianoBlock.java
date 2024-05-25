@@ -64,8 +64,9 @@ public class PianoBlock extends MultiblockMainPartBlock {
 
             mainBlockPos = MultiblockUtil.getMainBlock(pos, multiblockPartPos, state.get(FACING));
             mainBlockState = world.getBlockState(mainBlockPos);
-
         }
+        
+        if (!(mainBlockState.getBlock() instanceof MultiblockMainPartBlock)) return ActionResult.PASS;
 
         if (hit.getSide() == mainBlockState.get(FACING) || hit.getSide() == Direction.UP) {
 
