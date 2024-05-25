@@ -13,6 +13,7 @@ public abstract class SoundSystemMixin {
 
     @Inject(at = @At("RETURN"), method = "getAdjustedPitch", cancellable = true)
     private void getAdjustedPitch(SoundInstance sound, CallbackInfoReturnable<Float> info) {
+        // Allow to have a larger pitch range
         info.setReturnValue(MathHelper.clamp(sound.getPitch(), 0.05f, 10.0f));
     }
 

@@ -5,6 +5,7 @@ import funskydev.pianocraft.util.BlockPosEnum;
 import funskydev.pianocraft.util.MultiblockUtil;
 import funskydev.pianocraft.util.VoxelShapeUtil;
 import net.minecraft.block.*;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
@@ -144,6 +145,10 @@ public class MultiblockPartBlock extends HorizontalFacingBlock {
 
     public BlockPosEnum getMultiblockPartPos() {
         return multiblockPartPos;
+    }
+
+    public Block getMainBlock() {
+        return this.mainBlock;
     }
 
 }

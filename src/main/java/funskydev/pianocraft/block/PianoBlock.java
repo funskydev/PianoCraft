@@ -1,19 +1,25 @@
 package funskydev.pianocraft.block;
 
 import com.mojang.serialization.MapCodec;
+import funskydev.pianocraft.PCMain;
 import funskydev.pianocraft.screen.PianoScreenHandler;
 import funskydev.pianocraft.util.BlockPosEnum;
 import funskydev.pianocraft.util.MultiblockEnum;
 import funskydev.pianocraft.util.MultiblockUtil;
+import funskydev.pianocraft.util.NoteUtil;
 import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.HorizontalFacingBlock;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.screen.NamedScreenHandlerFactory;
 import net.minecraft.screen.SimpleNamedScreenHandlerFactory;
 import net.minecraft.sound.BlockSoundGroup;
+import net.minecraft.sound.SoundCategory;
+import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
@@ -23,6 +29,8 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.Random;
 
 public class PianoBlock extends MultiblockMainPartBlock {
 
@@ -39,15 +47,7 @@ public class PianoBlock extends MultiblockMainPartBlock {
                 MultiblockEnum.PIANO);
     }
 
-    @Override
-    public boolean isTransparent(BlockState state, BlockView world, BlockPos pos) {
-        return super.isTransparent(state, world, pos);
-    }
-
-    @Override
-    public float getAmbientOcclusionLightLevel(BlockState state, BlockView world, BlockPos pos) {
-        return 1.0f;
-    }
+    // Behavior
 
     @Override
     public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult hit) {
@@ -65,7 +65,7 @@ public class PianoBlock extends MultiblockMainPartBlock {
             mainBlockPos = MultiblockUtil.getMainBlock(pos, multiblockPartPos, state.get(FACING));
             mainBlockState = world.getBlockState(mainBlockPos);
         }
-        
+
         if (!(mainBlockState.getBlock() instanceof MultiblockMainPartBlock)) return ActionResult.PASS;
 
         if (hit.getSide() == mainBlockState.get(FACING) || hit.getSide() == Direction.UP) {
@@ -89,15 +89,23 @@ public class PianoBlock extends MultiblockMainPartBlock {
     @Override
     public NamedScreenHandlerFactory createScreenHandlerFactory(BlockState state, World world, BlockPos pos) {
         return new SimpleNamedScreenHandlerFactory(
-                ((syncId, inventory, player) -> {
-                    return new PianoScreenHandler(syncId, inventory, pos);
-                }),
+                ((syncId, inventory, player) -> new PianoScreenHandler(syncId, inventory, pos)),
                 CONTAINER_TITLE
         );
     }
+
+    // Rendering
+
+    @Override
+    public float getAmbientOcclusionLightLevel(BlockState state, BlockView world, BlockPos pos) {
+        return 1.0f;
+    }
+
+    // Registry
 
     @Override
     public MapCodec<? extends HorizontalFacingBlock> getCodec() {
         return CODEC;
     }
+
 }
