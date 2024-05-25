@@ -1,44 +1,46 @@
 package funskydev.pianocraft.client;
 
 import funskydev.pianocraft.PCMain;
-import funskydev.pianocraft.client.midi.MidiInputReceiver;
+import funskydev.pianocraft.client.midi.exception.PianoCraftMIDIException;
+import funskydev.pianocraft.client.midi.MidiDeviceUtil;
 import funskydev.pianocraft.registry.PCScreenHandlers;
 import funskydev.pianocraft.client.screen.PianoScreen;
 import net.fabricmc.api.ClientModInitializer;
 import net.minecraft.client.gui.screen.ingame.HandledScreens;
 
 import javax.sound.midi.*;
-import java.util.ArrayList;
 import java.util.List;
 
 public class PCMainClient implements ClientModInitializer {
 
-    private static MidiDevice midiDevice;
+    private static MidiDevice currentMidiDevice;
 
     @Override
     public void onInitializeClient() {
 
         PCMain.LOGGER.info("Starting PianoCraft client");
 
-        setCurrentMidiDeviceToDefaultIfNull();
-
         HandledScreens.register(PCScreenHandlers.PIANO_SCREEN_HANDLER, PianoScreen::new);
 
     }
 
     public static String getCurrentMidiDeviceName() {
-        return midiDevice == null ? null : midiDevice.getDeviceInfo().getName();
+        return currentMidiDevice == null ? null : currentMidiDevice.getDeviceInfo().getName();
     }
 
+    /**
+     * Select the next available MIDI device in the list of available devices
+     * <p>If no device is available, the current device will be set to null</p>
+     */
     public static void selectNextMidiDevice() {
 
-        List<MidiDevice> devices = getAvailableMidiDevices();
+        List<MidiDevice> devices = MidiDeviceUtil.getAvailableMidiDevices();
         if (devices.isEmpty()) {
             setCurrentMidiDevice(null);
             return;
         }
 
-        int index = devices.indexOf(midiDevice);
+        int index = devices.indexOf(currentMidiDevice);
         if (index == -1) {
             setCurrentMidiDevice(devices.get(0));
         } else {
@@ -49,115 +51,75 @@ public class PCMainClient implements ClientModInitializer {
 
     }
 
-    public static void ensureCurrentMidiDeviceIsAvailableOrSetToDefault() {
+    /**
+     * Search for a default MIDI device if none is selected
+     */
+    public static void searchForMidiDeviceIfNoneSelected() {
 
-        List<MidiDevice> devices = getAvailableMidiDevices();
-
-        if (!devices.contains(midiDevice)) setCurrentMidiDevice(null);
-
-        setCurrentMidiDeviceToDefaultIfNull();
-
+        if (currentMidiDevice != null) return;
+        setCurrentMidiDevice(MidiDeviceUtil.getAvailableMidiDevices().stream().findFirst().orElse(null));
     }
 
-    private static void setCurrentMidiDeviceToDefaultIfNull() {
+    /**
+     * If present, ensure the current MIDI device is available and ready
+     *
+     * <p>If the current device is not available anymore, it will be set to null</p>
+     * <p>If the current device is not open, it will be opened</p>
+     */
+    public static void ensureCurrentMidiDeviceIsAvailableAndReady() {
 
-        if (midiDevice != null) return;
+        if (currentMidiDevice == null) return;
 
-        List<MidiDevice> devices = getAvailableMidiDevices();
-        if (!devices.isEmpty()) {
-            setCurrentMidiDevice(devices.get(0));
-        } else {
+        if (!MidiDeviceUtil.getAvailableMidiDevices().contains(currentMidiDevice)) {
+            // If the current device is not available anymore, set it to null
+            setCurrentMidiDevice(null);
+            return;
+        }
+
+        // If the current device is not open, open it
+        if (currentMidiDevice.isOpen()) return;
+
+        try {
+            MidiDeviceUtil.openAndPrepareMidiDevice(currentMidiDevice);
+        } catch (PianoCraftMIDIException e) {
+            PCMain.LOGGER.error("Error preparing current device : " + e.getMessage());
             setCurrentMidiDevice(null);
         }
-
     }
 
-    private static void setCurrentMidiDevice(MidiDevice device) {
+    public static void closeCurrentMidiDevice() {
+        MidiDeviceUtil.closeMidiDevice(currentMidiDevice);
+        currentMidiDevice = null;
+    }
 
-        closeCurrentDevice();
+    /**
+     * <ul>
+     *     <li>Close the current device if present</li>
+     *     <li>Open the given device</li>
+     *     <li>Set the current device to the given device</li>
+     * </ul>
+     * <p>If any error, the current device will be set to null</p>
+     *
+     * @param newMidiDevice The device to set as the current device
+     */
+    private static void setCurrentMidiDevice(MidiDevice newMidiDevice) {
 
-        if (device == null) {
-            closeCurrentDevice();
-            return;
-        }
+        closeCurrentMidiDevice();
+
+        // If no device to set, keep the current device as null
+        if (newMidiDevice == null) return;
 
         try {
-            device.open();
-        } catch (MidiUnavailableException e) {
-            PCMain.LOGGER.error("Failed to open MIDI Device : " + device.getDeviceInfo().getName());
+            MidiDeviceUtil.openAndPrepareMidiDevice(newMidiDevice);
+        } catch (PianoCraftMIDIException e) {
+            PCMain.LOGGER.error("Error setting new device : " + e.getMessage());
             return;
         }
 
-        Transmitter transmitter;
+        // If no error, set the new device as the current device
+        currentMidiDevice = newMidiDevice;
 
-        try {
-            transmitter = device.getTransmitter();
-        } catch (MidiUnavailableException e) {
-            device.close();
-            PCMain.LOGGER.error("Failed to get MIDI Transmitter : " + device.getDeviceInfo().getName());
-            return;
-        }
-
-        if (transmitter == null) {
-            device.close();
-            PCMain.LOGGER.error("MIDI Transmitter is null : " + device.getDeviceInfo().getName());
-            return;
-        }
-
-        transmitter.setReceiver(new MidiInputReceiver());
-
-        midiDevice = device;
-
-        PCMain.LOGGER.info("MIDI Device set to : " + midiDevice.getDeviceInfo().getName());
-
-    }
-
-    private static void closeCurrentDevice() {
-
-        if (midiDevice == null) return;
-
-        PCMain.LOGGER.info("Closing MIDI Device : " + midiDevice.getDeviceInfo().getName());
-
-        midiDevice.close();
-        midiDevice = null;
-
-    }
-
-    private static List<MidiDevice> getAvailableMidiDevices() {
-
-        List<MidiDevice> devices = new ArrayList<>();
-
-        MidiDevice.Info[] infos = MidiSystem.getMidiDeviceInfo();
-        for (MidiDevice.Info info : infos) {
-
-            try {
-
-                MidiDevice device = MidiSystem.getMidiDevice(info);
-
-                // Check if the device is a real MIDI port
-                if ((!(device instanceof Sequencer) && !(device instanceof Synthesizer))) {
-
-                    // Check if the device has at least one transmitter
-                    if (device.getMaxTransmitters() != 0) {
-
-                        // Test if the device isn't already opened
-                        if (!device.isOpen()) {
-                            device.open();
-                            device.close();
-                        }
-
-                        devices.add(device);
-                    }
-
-                }
-
-            } catch (MidiUnavailableException e) {
-                PCMain.LOGGER.warn("Skipping an unavailable MIDI device : " + info.getName());
-            }
-
-        }
-
-        return devices;
+        PCMain.LOGGER.info("MIDI Device set to : " + currentMidiDevice.getDeviceInfo().getName());
 
     }
 

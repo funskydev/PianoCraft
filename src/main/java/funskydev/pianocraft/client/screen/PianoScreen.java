@@ -94,10 +94,19 @@ public class PianoScreen extends HandledScreen<PianoScreenHandler> {
         this.arrowsText = new TextWidget(10, 118, 120, 0, Text.of("Arrows - Change octave"), this.textRenderer);
         this.addDrawableChild(this.arrowsText);
 
-        PCMainClient.ensureCurrentMidiDeviceIsAvailableOrSetToDefault();
+        PCMainClient.searchForMidiDeviceIfNoneSelected();
+        PCMainClient.ensureCurrentMidiDeviceIsAvailableAndReady();
+
         updateMidiDeviceButtonText();
         updateKeybindingsMenu();
 
+    }
+
+    @Override
+    public void close() {
+        super.close();
+
+        PCMainClient.closeCurrentMidiDevice();
     }
 
     @Override

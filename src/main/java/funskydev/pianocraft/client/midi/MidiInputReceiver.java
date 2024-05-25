@@ -1,6 +1,7 @@
 package funskydev.pianocraft.client.midi;
 
 import funskydev.pianocraft.PCMain;
+import funskydev.pianocraft.client.PCMainClient;
 import funskydev.pianocraft.client.screen.PianoScreen;
 import funskydev.pianocraft.screen.PianoScreenHandler;
 import funskydev.pianocraft.util.NoteUtil;
