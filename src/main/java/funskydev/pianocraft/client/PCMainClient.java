@@ -18,7 +18,7 @@ public class PCMainClient implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
 
-        PCMain.LOGGER.info("Starting PianoCraft client");
+        PCMain.LOGGER.debug("Starting PianoCraft client");
 
         HandledScreens.register(PCScreenHandlers.PIANO_SCREEN_HANDLER, PianoScreen::new);
 
@@ -119,7 +119,7 @@ public class PCMainClient implements ClientModInitializer {
         // If no error, set the new device as the current device
         currentMidiDevice = newMidiDevice;
 
-        PCMain.LOGGER.info("MIDI Device set to : " + currentMidiDevice.getDeviceInfo().getName());
+        PCMain.LOGGER.debug("Current MIDI Device set to : " + currentMidiDevice.getDeviceInfo().getName());
 
     }
 

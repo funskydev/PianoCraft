@@ -17,14 +17,14 @@ public class PCMain implements ModInitializer {
     @Override
     public void onInitialize() {
 
-        LOGGER.info("PianoCraft is initializing");
+        LOGGER.debug("PianoCraft is initializing");
 
         PCBlocks.registerBlocks();
         PCItems.registerItems();
         PCScreenHandlers.registerScreenHandlers();
         PCPayloads.registerPayloads();
 
-        LOGGER.info("PianoCraft has been initialized");
+        LOGGER.debug("PianoCraft has been initialized");
 
     }
 

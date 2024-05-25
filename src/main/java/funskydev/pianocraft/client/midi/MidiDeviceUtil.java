@@ -38,14 +38,14 @@ public class MidiDeviceUtil {
 
         transmitter.setReceiver(new MidiInputReceiver());
 
-        PCMain.LOGGER.info("MIDI Device opened and ready : " + device.getDeviceInfo().getName());
+        PCMain.LOGGER.debug("MIDI Device opened and ready : " + device.getDeviceInfo().getName());
 
     }
 
     public static void closeMidiDevice(MidiDevice device) {
         if (device != null) {
-            PCMain.LOGGER.info("Closing MIDI Device : " + device.getDeviceInfo().getName());
             device.close();
+            PCMain.LOGGER.debug("MIDI Device closed : " + device.getDeviceInfo().getName());
         }
     }
 
