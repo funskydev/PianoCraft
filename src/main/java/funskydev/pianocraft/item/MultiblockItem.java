@@ -24,7 +24,7 @@ public class MultiblockItem extends BlockItem {
         // TODO: check for plants etc
 
         boolean result = MultiblockUtil.checkAround(ctx.getWorld(), MultiblockUtil.getMultBlocks(ctx.getBlockPos(), ctx.getHorizontalPlayerFacing().getOpposite(), multiblockType));
-        return result ? super.canPlace(ctx, state) : false;
+        return result && super.canPlace(ctx, state);
 
     }
 

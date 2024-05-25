@@ -1,24 +1,20 @@
 package funskydev.pianocraft.client.screen;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import funskydev.pianocraft.PCMain;
 import funskydev.pianocraft.client.PCMainClient;
-import funskydev.pianocraft.registry.PCPackets;
+import funskydev.pianocraft.network.PianoKeyPressedPayload;
 import funskydev.pianocraft.screen.PianoScreenHandler;
 import funskydev.pianocraft.util.NoteUtil;
 import funskydev.pianocraft.util.NotesEnum;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
-import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
-import net.minecraft.client.gui.DrawableHelper;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.gui.screen.narration.NarrationMessageBuilder;
 import net.minecraft.client.gui.tooltip.Tooltip;
 import net.minecraft.client.gui.widget.PressableWidget;
 import net.minecraft.client.gui.widget.TextWidget;
 import net.minecraft.client.util.InputUtil;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.network.PacketByteBuf;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
 import net.minecraft.util.Hand;
@@ -105,14 +101,13 @@ public class PianoScreen extends HandledScreen<PianoScreenHandler> {
     }
 
     @Override
-    protected void drawBackground(MatrixStack matrices, float delta, int mouseX, int mouseY) {
+    protected void drawBackground(DrawContext context, float delta, int mouseX, int mouseY) {
         if (!showKeybindings) return;
-        RenderSystem.setShaderTexture(0, TEXTURE);
-        DrawableHelper.drawTexture(matrices, 6, 45, 0, 0, 0, 128, 64, 128, 64);
+        context.drawTexture(TEXTURE, 6, 45, 0, 0, 0, 128, 64, 128, 64);
     }
 
     @Override
-    protected void drawForeground(MatrixStack matrices, int mouseX, int mouseY) {
+    protected void drawForeground(DrawContext context, int mouseX, int mouseY) {
 
     }
 
@@ -172,12 +167,9 @@ public class PianoScreen extends HandledScreen<PianoScreenHandler> {
     }
 
     private void sendNoteToServer(NotesEnum note, int octave, float volume) {
-        PacketByteBuf buf = PacketByteBufs.create();
-        buf.writeInt(note.ordinal());
-        buf.writeInt(octave);
-        buf.writeFloat(volume);
 
-        ClientPlayNetworking.send(PCPackets.KEY_PRESSED_PACKET_ID, buf);
+        ClientPlayNetworking.send(new PianoKeyPressedPayload(note.ordinal(), octave, volume));
+
     }
 
     private void midiDeviceButtonPressed() {

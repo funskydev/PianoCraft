@@ -1,11 +1,14 @@
 package funskydev.pianocraft.block;
 
+import com.mojang.serialization.MapCodec;
 import funskydev.pianocraft.screen.PianoScreenHandler;
 import funskydev.pianocraft.util.BlockPosEnum;
 import funskydev.pianocraft.util.MultiblockEnum;
 import funskydev.pianocraft.util.MultiblockUtil;
+import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.BlockState;
-import net.minecraft.block.Material;
+import net.minecraft.block.Blocks;
+import net.minecraft.block.HorizontalFacingBlock;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.screen.NamedScreenHandlerFactory;
@@ -23,10 +26,17 @@ import org.jetbrains.annotations.Nullable;
 
 public class PianoBlock extends MultiblockMainPartBlock {
 
-    private static Text TITLE = Text.translatable("container.pianocraft.piano");
+    public static final MapCodec<PianoBlock> CODEC = PianoBlock.createCodec(PianoBlock::new);
 
-    public PianoBlock() {
-        super(MultiblockSettings.of(Material.WOOD).strength(1.0f, 3.0f).nonOpaque().sounds(BlockSoundGroup.WOOD), MultiblockEnum.PIANO);
+    private static final Text CONTAINER_TITLE = Text.translatable("container.pianocraft.piano");
+
+    public PianoBlock(AbstractBlock.Settings settings) {
+        super(settings
+                .mapColor(Blocks.SPRUCE_PLANKS.getDefaultMapColor())
+                .strength(1.0f, 3.0f)
+                .nonOpaque()
+                .sounds(BlockSoundGroup.WOOD),
+                MultiblockEnum.PIANO);
     }
 
     @Override
@@ -40,7 +50,7 @@ public class PianoBlock extends MultiblockMainPartBlock {
     }
 
     @Override
-    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
+    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult hit) {
 
         BlockState mainBlockState = state;
         BlockPos mainBlockPos = pos;
@@ -81,7 +91,12 @@ public class PianoBlock extends MultiblockMainPartBlock {
                 ((syncId, inventory, player) -> {
                     return new PianoScreenHandler(syncId, inventory, pos);
                 }),
-                TITLE
+                CONTAINER_TITLE
         );
+    }
+
+    @Override
+    public MapCodec<? extends HorizontalFacingBlock> getCodec() {
+        return CODEC;
     }
 }

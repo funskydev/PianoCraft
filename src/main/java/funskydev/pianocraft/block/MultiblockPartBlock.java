@@ -1,10 +1,9 @@
 package funskydev.pianocraft.block;
 
-import funskydev.pianocraft.PCMain;
+import com.mojang.serialization.MapCodec;
 import funskydev.pianocraft.util.BlockPosEnum;
 import funskydev.pianocraft.util.MultiblockUtil;
 import funskydev.pianocraft.util.VoxelShapeUtil;
-import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.minecraft.block.*;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemPlacementContext;
@@ -12,14 +11,13 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.state.StateManager;
 import net.minecraft.text.MutableText;
 import net.minecraft.util.ActionResult;
-import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
-import net.minecraft.world.WorldAccess;
+import net.minecraft.world.WorldView;
 
 public class MultiblockPartBlock extends HorizontalFacingBlock {
 
@@ -33,7 +31,7 @@ public class MultiblockPartBlock extends HorizontalFacingBlock {
 
     public MultiblockPartBlock(BlockPosEnum pos, MultiblockMainPartBlock mainBlock, VoxelShape shape) {
 
-        super(FabricBlockSettings.copyOf(mainBlock).dropsNothing().nonOpaque().noBlockBreakParticles());
+        super(AbstractBlock.Settings.copy(mainBlock).dropsNothing().nonOpaque().noBlockBreakParticles());
 
         this.multiblockPartPos = pos;
         this.mainBlock = mainBlock;
@@ -47,8 +45,8 @@ public class MultiblockPartBlock extends HorizontalFacingBlock {
     // Behaviors
     
     @Override
-    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
-        return mainBlock.onUse(state, world, pos, player, hand, hit);
+    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult hit) {
+        return mainBlock.onUse(state, world, pos, player, hit);
     }
 
     @Override
@@ -94,7 +92,7 @@ public class MultiblockPartBlock extends HorizontalFacingBlock {
     }
 
     @Override
-    public ItemStack getPickStack(BlockView world, BlockPos pos, BlockState state) {
+    public ItemStack getPickStack(WorldView world, BlockPos pos, BlockState state) {
         return new ItemStack(mainBlock);
     }
 
@@ -109,8 +107,8 @@ public class MultiblockPartBlock extends HorizontalFacingBlock {
     }
 
     @Override
-    public void onBreak(World world, BlockPos pos, BlockState state, PlayerEntity player) {
-        super.onBreak(world, pos, state, player);
+    public BlockState onBreak(World world, BlockPos pos, BlockState state, PlayerEntity player) {
+        return super.onBreak(world, pos, state, player);
     }
 
     // Facing
@@ -124,6 +122,14 @@ public class MultiblockPartBlock extends HorizontalFacingBlock {
     protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
         builder.add(FACING);
     }
+
+    // Registry
+
+    @Override
+    protected MapCodec<? extends HorizontalFacingBlock> getCodec() {
+        return this.mainBlock.getCodec();
+    }
+
 
     // Multiblock part methods
 

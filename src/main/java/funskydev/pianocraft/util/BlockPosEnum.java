@@ -8,13 +8,13 @@ public enum BlockPosEnum {
     TOP_EAST(true),
     TOP_WEST(true);
 
-    private boolean isTop;
+    private final boolean isTop;
 
-    private BlockPosEnum() {
+    BlockPosEnum() {
         this.isTop = false;
     }
 
-    private BlockPosEnum(boolean isTop) {
+    BlockPosEnum(boolean isTop) {
         this.isTop = isTop;
     }
 

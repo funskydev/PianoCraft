@@ -43,7 +43,7 @@ public class PianoScreenHandler extends ScreenHandler {
     @Override
     public boolean onButtonClick(PlayerEntity player, int id) {
 
-        if (player.world instanceof ServerWorld serverWorld) {
+        if (player.getWorld() instanceof ServerWorld serverWorld) {
 
             NotesEnum note = NoteUtil.getNoteFromId(id);
             int octave = NoteUtil.getOctaveFromId(id);

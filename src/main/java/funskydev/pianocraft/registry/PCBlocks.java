@@ -7,8 +7,8 @@ import funskydev.pianocraft.block.PianoBlock;
 import funskydev.pianocraft.item.MultiblockItem;
 import funskydev.pianocraft.util.BlockPosEnum;
 import funskydev.pianocraft.util.MultiblockEnum;
-import net.fabricmc.fabric.api.item.v1.FabricItemSettings;
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
+import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.Block;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
@@ -23,7 +23,7 @@ import java.util.Map;
 
 public class PCBlocks {
 
-    public static final MultiblockMainPartBlock PIANO = registerMultiblockWithItem("piano", new PianoBlock());
+    public static final MultiblockMainPartBlock PIANO = registerMultiblockWithItem("piano", new PianoBlock(AbstractBlock.Settings.create()));
 
     public static Map<MultiblockPartBlock, MultiblockMainPartBlock> MULTIBLOCKS = new LinkedHashMap<>();
 
@@ -69,13 +69,13 @@ public class PCBlocks {
 
     private static <T extends MultiblockMainPartBlock> T registerMultiblockWithItem(String name, T block) {
 
-        return registerBlockWithBlockItem(name, block, new MultiblockItem(block, new FabricItemSettings(), block.getMultiblockType()));
+        return registerBlockWithBlockItem(name, block, new MultiblockItem(block, new Item.Settings(), block.getMultiblockType()));
 
     }
 
     private static void registerBlockItem(String name, Block block) {
 
-        registerBlockItem(name, new BlockItem(block, new FabricItemSettings()));
+        registerBlockItem(name, new BlockItem(block, new Item.Settings()));
 
     }
 
@@ -89,7 +89,7 @@ public class PCBlocks {
     public static void registerBlocks(){
         registerMultiblocks();
 
-        PCMain.LOGGER.info("Blocks registered");
+        PCMain.LOGGER.debug("Blocks registered");
     }
 
 }

@@ -10,13 +10,13 @@ public class PCItems {
 
     private static <T extends Item> T register(String name, T item) {
 
-        PCMain.LOGGER.info("Registering item : " + name);
+        PCMain.LOGGER.debug("Registering item : " + name);
         return Registry.register(Registries.ITEM, new Identifier(PCMain.MOD_ID, name), item);
 
     }
 
     public static void registerItems(){
-        PCMain.LOGGER.info("Items registered");
+        PCMain.LOGGER.debug("Items registered");
     }
 
 }

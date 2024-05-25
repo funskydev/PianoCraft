@@ -26,10 +26,6 @@ public class PCMainClient implements ClientModInitializer {
 
     }
 
-    public static MidiDevice getCurrentMidiDevice() {
-        return midiDevice;
-    }
-
     public static String getCurrentMidiDeviceName() {
         return midiDevice == null ? null : midiDevice.getDeviceInfo().getName();
     }

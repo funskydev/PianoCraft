@@ -10,14 +10,6 @@ public class NoteUtil {
         return getPitchFromNoteAndOctave(note.ordinal(), octave);
     }
 
-    public static int convertNoteAndOctaveToId(int note, int octave) {
-        return octave * 12 + note;
-    }
-
-    public static int convertNoteAndOctaveToId(NotesEnum note, int octave) {
-        return convertNoteAndOctaveToId(note.ordinal(), octave);
-    }
-
     public static NotesEnum getNoteFromId(int id) {
         return NotesEnum.getNote(id % 12);
     }
