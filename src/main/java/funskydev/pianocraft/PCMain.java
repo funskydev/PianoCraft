@@ -19,7 +19,7 @@ public class PCMain implements ModInitializer {
 
         LOGGER.debug("PianoCraft is initializing");
 
-        PCBlocks.registerBlocks();
+        PCBlocks.registerAllBlocks();
         PCItems.registerItems();
         PCScreenHandlers.registerScreenHandlers();
         PCPayloads.registerPayloads();

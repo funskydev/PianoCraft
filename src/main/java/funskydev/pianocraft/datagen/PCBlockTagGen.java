@@ -27,7 +27,7 @@ public class PCBlockTagGen extends FabricTagProvider.BlockTagProvider {
 
     }
 
-    private void addMultiblockToTag(TagKey<Block> tag, MultiblockMainPartBlock mainBlock) {
+    private void addMultiblockToTag(TagKey<Block> tag, Block mainBlock) {
 
         valueLookupBuilder(tag).add(mainBlock);
 

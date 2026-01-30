@@ -10,7 +10,9 @@ import funskydev.pianocraft.util.MultiblockEnum;
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.item.Item;
@@ -19,14 +21,61 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.function.Function;
 
 public class PCBlocks {
 
-    public static final MultiblockMainPartBlock PIANO = registerMultiblockWithItem("piano", new PianoBlock(BlockBehaviour.Properties.of()));
+    public static final Block PIANO = registerMultiblockWithBlockItem("piano", PianoBlock::new, BlockBehaviour.Properties.of());
 
     public static Map<MultiblockPartBlock, MultiblockMainPartBlock> MULTIBLOCKS = new LinkedHashMap<>();
 
-    public static void registerMultiblocks() {
+    private static <T extends MultiblockMainPartBlock> T registerMultiblockWithBlockItem(String name,
+                                                                                         Function<BlockBehaviour.Properties, T> blockFactory,
+                                                                                         BlockBehaviour.Properties blockSettings) {
+        T mainPartBlock = registerBlock(name, blockFactory, blockSettings);
+        registerBlockItem(name,
+                (itemSettings) -> new MultiblockItem(mainPartBlock, itemSettings),
+                new Item.Properties());
+
+        return mainPartBlock;
+    }
+
+    private static <T extends Block> T registerBlock(String name,
+                                                     Function<BlockBehaviour.Properties, T> blockFactory,
+                                                     BlockBehaviour.Properties settings) {
+
+        ResourceKey<Block> blockKey = keyOfBlock(name);
+        T block = blockFactory.apply(settings.setId(blockKey));
+
+        return Registry.register(BuiltInRegistries.BLOCK, blockKey, block);
+    }
+
+    private static void registerBlockItem(String name,
+                                          Function<Item.Properties, BlockItem> blockItemFactory,
+                                          Item.Properties settings) {
+
+        ResourceKey<Item> itemKey = keyOfItem(name);
+        BlockItem blockItem = blockItemFactory.apply(settings.setId(itemKey).useBlockDescriptionPrefix());
+        Registry.register(BuiltInRegistries.ITEM, itemKey, blockItem);
+
+        ItemGroupEvents.modifyEntriesEvent(CreativeModeTabs.FUNCTIONAL_BLOCKS).register(entries -> entries.addAfter(Items.JUKEBOX, blockItem));
+    }
+
+    private static ResourceKey<Block> keyOfBlock(String name) {
+        return ResourceKey.create(Registries.BLOCK, Identifier.fromNamespaceAndPath(PCMain.MOD_ID, name));
+    }
+
+    private static ResourceKey<Item> keyOfItem(String name) {
+        return ResourceKey.create(Registries.ITEM, Identifier.fromNamespaceAndPath(PCMain.MOD_ID, name));
+    }
+
+    public static void registerAllBlocks(){
+        registerAllMultiblocks();
+
+        PCMain.LOGGER.debug("Blocks registered");
+    }
+
+    public static void registerAllMultiblocks() {
 
         for(MultiblockEnum multiblock : MultiblockEnum.values()) {
 
@@ -37,58 +86,16 @@ public class PCBlocks {
                 // if the main block is null, skip registering the multiblock
                 if (mainBlock == null) break;
 
-                MultiblockPartBlock mbpBlock = new MultiblockPartBlock(pos, mainBlock, multiblock.getShapeForBlock(pos));
-                MULTIBLOCKS.put(registerBlock(multiblock.getName(pos), mbpBlock, false), mainBlock);
+                MultiblockPartBlock multiblockPartBlock = registerBlock(multiblock.getName(pos),
+                        (blockSettings) -> new MultiblockPartBlock(blockSettings, pos, mainBlock, multiblock.getShapeForBlock(pos)),
+                        BlockBehaviour.Properties.of());
+
+                MULTIBLOCKS.put(multiblockPartBlock, mainBlock);
 
             }
 
         }
 
-    }
-
-    private static <T extends Block> T registerBlock(String name, T block) {
-
-        return registerBlock(name, block, true);
-
-    }
-
-    private static <T extends Block> T registerBlock(String name, T block, boolean registerBlockItem) {
-
-        if (registerBlockItem) registerBlockItem(name, block);
-        return Registry.register(BuiltInRegistries.BLOCK, Identifier.fromNamespaceAndPath(PCMain.MOD_ID, name), block);
-
-    }
-
-    private static <T extends Block> T registerBlockWithBlockItem(String name, T block, BlockItem blockItem) {
-
-        registerBlockItem(name, blockItem);
-        return registerBlock(name, block, false);
-
-    }
-
-    private static <T extends MultiblockMainPartBlock> T registerMultiblockWithItem(String name, T block) {
-
-        return registerBlockWithBlockItem(name, block, new MultiblockItem(block, new Item.Properties(), block.getMultiblockType()));
-
-    }
-
-    private static void registerBlockItem(String name, Block block) {
-
-        registerBlockItem(name, new BlockItem(block, new Item.Properties()));
-
-    }
-
-    private static void registerBlockItem(String name, BlockItem blockItem) {
-
-        Item item = Registry.register(BuiltInRegistries.ITEM, Identifier.fromNamespaceAndPath(PCMain.MOD_ID, name), blockItem);
-        ItemGroupEvents.modifyEntriesEvent(CreativeModeTabs.FUNCTIONAL_BLOCKS).register(entries -> entries.addAfter(Items.JUKEBOX, item));
-
-    }
-
-    public static void registerBlocks(){
-        registerMultiblocks();
-
-        PCMain.LOGGER.debug("Blocks registered");
     }
 
 }

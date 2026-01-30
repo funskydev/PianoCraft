@@ -1,5 +1,6 @@
 package funskydev.pianocraft.item;
 
+import funskydev.pianocraft.block.MultiblockMainPartBlock;
 import funskydev.pianocraft.util.MultiblockEnum;
 import funskydev.pianocraft.util.MultiblockUtil;
 import net.minecraft.world.item.BlockItem;
@@ -11,10 +12,10 @@ public class MultiblockItem extends BlockItem {
 
     private final MultiblockEnum multiblockType;
 
-    public MultiblockItem(Block block, Properties settings, MultiblockEnum multiblockType) {
+    public MultiblockItem(MultiblockMainPartBlock mainPartBlock, Properties settings) {
 
-        super(block, settings);
-        this.multiblockType = multiblockType;
+        super(mainPartBlock, settings);
+        this.multiblockType = mainPartBlock.getMultiblockType();
 
     }
 

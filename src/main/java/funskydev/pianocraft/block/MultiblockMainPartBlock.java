@@ -37,7 +37,7 @@ public abstract class MultiblockMainPartBlock extends HorizontalDirectionalBlock
 
     protected MultiblockMainPartBlock(BlockBehaviour.Properties settings, MultiblockEnum multiblockType) {
 
-        super(settings.pushReaction(PushReaction.BLOCK));
+        super(settings.pushReaction(PushReaction.DESTROY));
 
         this.multiblockType = multiblockType;
         this.northShape = multiblockType.getMainBlockShape();
@@ -65,10 +65,7 @@ public abstract class MultiblockMainPartBlock extends HorizontalDirectionalBlock
     public void affectNeighborsAfterRemoval(BlockState state, ServerLevel level, BlockPos pos, boolean movedByPiston) {
         super.affectNeighborsAfterRemoval(state, level, pos, movedByPiston);
 
-        PCMain.LOGGER.info("Blockstate MAIN removed: " + state);
-        PCMain.LOGGER.info("Blockstate at this pos: " + level.getBlockState(pos));
-
-        //if (!state.is(newState.getBlock())) destroyMultiblockParts(world, pos, state);
+        destroyMultiblockParts(level, pos, state);
     }
 
     @Override

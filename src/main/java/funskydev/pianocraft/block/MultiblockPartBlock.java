@@ -22,6 +22,7 @@ import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.material.PushReaction;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
@@ -36,9 +37,9 @@ public class MultiblockPartBlock extends HorizontalDirectionalBlock {
     private final VoxelShape southShape;
     private final VoxelShape westShape;
 
-    public MultiblockPartBlock(BlockPosEnum pos, MultiblockMainPartBlock mainBlock, VoxelShape shape) {
+    public MultiblockPartBlock(BlockBehaviour.Properties settings, BlockPosEnum pos, MultiblockMainPartBlock mainBlock, VoxelShape shape) {
 
-        super(BlockBehaviour.Properties.ofFullCopy(mainBlock).noLootTable().noOcclusion().noTerrainParticles());
+        super(settings.pushReaction(PushReaction.DESTROY).noLootTable().noOcclusion().noTerrainParticles());
 
         this.multiblockPartPos = pos;
         this.mainBlock = mainBlock;
@@ -60,12 +61,7 @@ public class MultiblockPartBlock extends HorizontalDirectionalBlock {
     public void affectNeighborsAfterRemoval(BlockState state, ServerLevel level, BlockPos pos, boolean movedByPiston) {
         super.affectNeighborsAfterRemoval(state, level, pos, movedByPiston);
 
-        PCMain.LOGGER.info("Blockstate part removed: " + state);
-        PCMain.LOGGER.info("Blockstate at this pos: " + level.getBlockState(pos));
-
-        /*if (!state.is(newState.getBlock())) {
-            destroyMultiblock(level, pos, state);
-        }*/
+        destroyMultiblock(level, pos, state);
     }
 
     @Override
@@ -86,10 +82,10 @@ public class MultiblockPartBlock extends HorizontalDirectionalBlock {
 
     // Rendering
 
-    /*@Override
+    @Override
     public RenderShape getRenderShape(BlockState state) {
         return RenderShape.INVISIBLE;
-    }*/
+    }
 
     @Override
     protected float getShadeBrightness(BlockState state, BlockGetter world, BlockPos pos) {
