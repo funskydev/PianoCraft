@@ -1,13 +1,14 @@
 package funskydev.pianocraft.block;
 
 import com.mojang.serialization.MapCodec;
+import funskydev.pianocraft.PCMain;
 import funskydev.pianocraft.util.BlockPosEnum;
 import funskydev.pianocraft.util.MultiblockUtil;
 import funskydev.pianocraft.util.VoxelShapeUtil;
-import net.minecraft.block.*;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -56,12 +57,15 @@ public class MultiblockPartBlock extends HorizontalDirectionalBlock {
     }
 
     @Override
-    public void onStateReplaced(BlockState state, Level world, BlockPos pos, BlockState newState, boolean moved) {
-        super.affectNeighborsAfterRemoval(state, world, pos, newState, moved);
+    public void affectNeighborsAfterRemoval(BlockState state, ServerLevel level, BlockPos pos, boolean movedByPiston) {
+        super.affectNeighborsAfterRemoval(state, level, pos, movedByPiston);
 
-        if (!state.is(newState.getBlock())) {
-            destroyMultiblock(world, pos, state);
-        }
+        PCMain.LOGGER.info("Blockstate part removed: " + state);
+        PCMain.LOGGER.info("Blockstate at this pos: " + level.getBlockState(pos));
+
+        /*if (!state.is(newState.getBlock())) {
+            destroyMultiblock(level, pos, state);
+        }*/
     }
 
     @Override
@@ -82,23 +86,18 @@ public class MultiblockPartBlock extends HorizontalDirectionalBlock {
 
     // Rendering
 
-    @Override
-    public boolean isTransparent(BlockState state, BlockGetter world, BlockPos pos) {
-        return true;
-    }
-
-    @Override
+    /*@Override
     public RenderShape getRenderShape(BlockState state) {
         return RenderShape.INVISIBLE;
-    }
+    }*/
 
     @Override
-    public float getShadeBrightness(BlockState state, BlockGetter world, BlockPos pos) {
+    protected float getShadeBrightness(BlockState state, BlockGetter world, BlockPos pos) {
         return 1.0f;
     }
 
     @Override
-    public ItemStack getPickStack(LevelReader world, BlockPos pos, BlockState state) {
+    protected ItemStack getCloneItemStack(LevelReader level, BlockPos pos, BlockState state, boolean includeData) {
         return new ItemStack(mainBlock);
     }
 

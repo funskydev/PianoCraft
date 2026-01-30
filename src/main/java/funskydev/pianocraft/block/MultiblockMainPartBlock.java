@@ -1,12 +1,13 @@
 package funskydev.pianocraft.block;
 
 import com.mojang.serialization.MapCodec;
+import funskydev.pianocraft.PCMain;
 import funskydev.pianocraft.util.MultiblockEnum;
 import funskydev.pianocraft.util.MultiblockUtil;
 import funskydev.pianocraft.util.VoxelShapeUtil;
-import net.minecraft.block.*;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
@@ -61,25 +62,24 @@ public abstract class MultiblockMainPartBlock extends HorizontalDirectionalBlock
     }
 
     @Override
-    public void onStateReplaced(BlockState state, Level world, BlockPos pos, BlockState newState, boolean moved) {
-        super.affectNeighborsAfterRemoval(state, world, pos, newState, moved);
+    public void affectNeighborsAfterRemoval(BlockState state, ServerLevel level, BlockPos pos, boolean movedByPiston) {
+        super.affectNeighborsAfterRemoval(state, level, pos, movedByPiston);
 
-        if (!state.is(newState.getBlock())) destroyMultiblockParts(world, pos, state);
+        PCMain.LOGGER.info("Blockstate MAIN removed: " + state);
+        PCMain.LOGGER.info("Blockstate at this pos: " + level.getBlockState(pos));
+
+        //if (!state.is(newState.getBlock())) destroyMultiblockParts(world, pos, state);
     }
 
     @Override
     public VoxelShape getShape(BlockState state, BlockGetter world, BlockPos pos, CollisionContext context) {
 
-        switch (state.getValue(FACING)) {
-            case EAST:
-                return eastShape;
-            case SOUTH:
-                return southShape;
-            case WEST:
-                return westShape;
-            default:
-                return northShape;
-        }
+        return switch (state.getValue(FACING)) {
+            case EAST -> eastShape;
+            case SOUTH -> southShape;
+            case WEST -> westShape;
+            default -> northShape;
+        };
 
     }
 

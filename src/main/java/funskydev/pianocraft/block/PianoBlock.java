@@ -66,7 +66,7 @@ public class PianoBlock extends MultiblockMainPartBlock {
 
         if (hit.getDirection() == mainBlockState.getValue(FACING) || hit.getDirection() == Direction.UP) {
 
-            if (world.isClientSide) {
+            if (world.isClientSide()) {
                 Minecraft.getInstance().gameRenderer.itemInHandRenderer.itemUsed(InteractionHand.OFF_HAND);
                 return InteractionResult.SUCCESS;
             }

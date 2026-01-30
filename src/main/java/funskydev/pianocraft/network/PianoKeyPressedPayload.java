@@ -11,7 +11,7 @@ public record PianoKeyPressedPayload(int note,
                                      int octave,
                                      float volume) implements CustomPacketPayload {
 
-    public static final CustomPacketPayload.Type<PianoKeyPressedPayload> ID = new CustomPacketPayload.Type<>(new Identifier(PCMain.MOD_ID, "piano_key_pressed"));
+    public static final CustomPacketPayload.Type<PianoKeyPressedPayload> ID = new CustomPacketPayload.Type<>(Identifier.fromNamespaceAndPath(PCMain.MOD_ID, "piano_key_pressed"));
 
     public static final StreamCodec<RegistryFriendlyByteBuf, PianoKeyPressedPayload> CODEC =
             CustomPacketPayload.codec(PianoKeyPressedPayload::write, PianoKeyPressedPayload::new);

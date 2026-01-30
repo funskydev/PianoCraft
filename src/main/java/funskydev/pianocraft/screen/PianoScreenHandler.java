@@ -37,7 +37,7 @@ public class PianoScreenHandler extends AbstractContainerMenu {
     @Override
     public boolean clickMenuButton(Player player, int id) {
 
-        if (player.getWorld() instanceof ServerLevel serverWorld) {
+        if (player.level() instanceof ServerLevel serverWorld) {
 
             NotesEnum note = NoteUtil.getNoteFromId(id);
             int octave = NoteUtil.getOctaveFromId(id);

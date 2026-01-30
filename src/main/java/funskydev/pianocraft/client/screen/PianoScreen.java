@@ -14,7 +14,11 @@ import net.minecraft.client.gui.components.StringWidget;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.client.input.InputWithModifiers;
+import net.minecraft.client.input.KeyEvent;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.Identifier;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.InteractionHand;
@@ -26,7 +30,7 @@ import java.util.List;
 
 public class PianoScreen extends AbstractContainerScreen<PianoScreenHandler> {
 
-    private static final Identifier TEXTURE = new Identifier(PCMain.MOD_ID, "textures/gui/piano.png");
+    private static final Identifier TEXTURE = Identifier.fromNamespaceAndPath(PCMain.MOD_ID, "textures/gui/piano.png");
 
     private AbstractButton midiDeviceButton;
     private List<StringWidget> keyWidgets = new ArrayList<>();
@@ -50,13 +54,18 @@ public class PianoScreen extends AbstractContainerScreen<PianoScreenHandler> {
 
         this.midiDeviceButton = new AbstractButton(10, 20, 120, 20, Component.nullToEmpty("Unknown")) {
             @Override
-            protected void updateWidgetNarration(NarrationElementOutput builder) {
+            public void onPress(InputWithModifiers input) {
+                midiDeviceButtonPressed();
+            }
+
+            @Override
+            protected void renderContents(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
 
             }
 
             @Override
-            public void onPress() {
-                midiDeviceButtonPressed();
+            protected void updateWidgetNarration(NarrationElementOutput builder) {
+
             }
         };
 
@@ -81,7 +90,6 @@ public class PianoScreen extends AbstractContainerScreen<PianoScreenHandler> {
             int y = isSharp ? 73 : 95;
 
             StringWidget keyWidget = new StringWidget(x, y, 10, 10, Component.nullToEmpty(""), this.font);
-            keyWidget.setTextColor(0xFFAA00);
 
             this.addRenderableWidget(keyWidget);
             this.keyWidgets.add(keyWidget);
@@ -112,7 +120,7 @@ public class PianoScreen extends AbstractContainerScreen<PianoScreenHandler> {
     @Override
     protected void renderBg(GuiGraphics context, float delta, int mouseX, int mouseY) {
         if (!showKeybindings) return;
-        context.blit(TEXTURE, 6, 45, 0, 0, 0, 128, 64, 128, 64);
+        context.blit(RenderPipelines.GUI_TEXTURED, TEXTURE, 6, 45, 0, 0, 0, 128, 64, 128, 64);
     }
 
     @Override
@@ -121,9 +129,12 @@ public class PianoScreen extends AbstractContainerScreen<PianoScreenHandler> {
     }
 
     @Override
-    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+    public boolean keyPressed(KeyEvent event) {
 
-        InputConstants.Key pressedKey = InputConstants.getKey(keyCode, scanCode);
+        int keyCode = event.key();
+        int scanCode = event.scancode();
+
+        InputConstants.Key pressedKey = InputConstants.getKey(event);
 
         if (keyCode == GLFW.GLFW_KEY_ESCAPE) {
             this.onClose();
@@ -219,7 +230,7 @@ public class PianoScreen extends AbstractContainerScreen<PianoScreenHandler> {
 
             InputConstants.Key keyboardKey = InputConstants.getKey(key.getTranslationKey());
 
-            this.keyWidgets.get(i).setMessage(Component.nullToEmpty(keyboardKey.getDisplayName().getString().toUpperCase()));
+            this.keyWidgets.get(i).setMessage(Component.literal(keyboardKey.getDisplayName().getString().toUpperCase()).withColor(0xFFAA00));
             this.keyWidgets.get(i).setTooltip(Tooltip.create(Component.nullToEmpty(NotesEnum.getNote(i).getNoteName() + octave)));
 
         }

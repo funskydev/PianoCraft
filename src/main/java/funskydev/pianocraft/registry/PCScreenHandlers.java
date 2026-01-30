@@ -15,7 +15,7 @@ public class PCScreenHandlers {
 
     private static <S extends AbstractContainerMenu> MenuType<S> registerScreenHandler(String name, MenuType.MenuSupplier<S> screenHandlerFactory) {
         return Registry.register(BuiltInRegistries.MENU,
-                new Identifier(PCMain.MOD_ID, "piano"),
+                Identifier.fromNamespaceAndPath(PCMain.MOD_ID, "piano"),
                 new MenuType<>(screenHandlerFactory,FeatureFlags.VANILLA_SET));
     }
 

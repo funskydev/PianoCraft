@@ -5,9 +5,13 @@ import funskydev.pianocraft.block.MultiblockPartBlock;
 import funskydev.pianocraft.registry.PCBlocks;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricTagProvider;
+import net.fabricmc.fabric.impl.datagen.FabricTagBuilder;
 import net.minecraft.core.HolderLookup;
-import net.minecraft.registry.*;
 import net.minecraft.tags.BlockTags;
+import net.minecraft.tags.TagBuilder;
+import net.minecraft.tags.TagKey;
+import net.minecraft.world.level.block.Block;
+
 import java.util.concurrent.CompletableFuture;
 
 public class PCBlockTagGen extends FabricTagProvider.BlockTagProvider {
@@ -17,21 +21,19 @@ public class PCBlockTagGen extends FabricTagProvider.BlockTagProvider {
     }
 
     @Override
-    protected void addTags(HolderLookup.Provider arg) {
+    protected void addTags(HolderLookup.Provider wrapperLookup) {
 
-        FabricTagBuilder axeMineableTag = getOrCreateTagBuilder(BlockTags.MINEABLE_WITH_AXE);
-
-        addMultiblockToTag(axeMineableTag, PCBlocks.PIANO);
+        addMultiblockToTag(BlockTags.MINEABLE_WITH_AXE, PCBlocks.PIANO);
 
     }
 
-    private static void addMultiblockToTag(FabricTagBuilder tag, MultiblockMainPartBlock mainBlock) {
+    private void addMultiblockToTag(TagKey<Block> tag, MultiblockMainPartBlock mainBlock) {
 
-        tag.add(mainBlock);
+        valueLookupBuilder(tag).add(mainBlock);
 
         for(MultiblockPartBlock partBlock : PCBlocks.MULTIBLOCKS.keySet()) {
 
-            if (PCBlocks.MULTIBLOCKS.get(partBlock).equals(mainBlock)) tag.add(partBlock);
+            if (PCBlocks.MULTIBLOCKS.get(partBlock).equals(mainBlock)) valueLookupBuilder(tag).add(partBlock);
 
         }
 

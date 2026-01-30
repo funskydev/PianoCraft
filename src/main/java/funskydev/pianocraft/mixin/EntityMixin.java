@@ -44,7 +44,7 @@ public abstract class EntityMixin {
 
             float pitch = NoteUtil.getPitchFromNoteAndOctave(note, octave);
 
-            entity.getWorld().playSound(null, pos, SoundEvents.NOTE_BLOCK_HARP.value(), SoundSource.RECORDS, volume, pitch);
+            entity.level().playSound(null, pos, SoundEvents.NOTE_BLOCK_HARP.value(), SoundSource.RECORDS, volume, pitch);
         }
     }
 

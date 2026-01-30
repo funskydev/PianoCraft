@@ -1,4 +1,4 @@
 accessWidener v1 named
 
-accessible class net/minecraft/client/render/item/HeldItemRenderer$HandRenderType
-accessible method net/minecraft/client/render/item/HeldItemRenderer renderArmHoldingItem (Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;IFFLnet/minecraft/util/Arm;)V
+accessible class net/minecraft/client/renderer/ItemInHandRenderer$HandRenderSelection
+accessible method net/minecraft/client/renderer/ItemInHandRenderer renderPlayerArm (Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;IFFLnet/minecraft/world/entity/HumanoidArm;)V

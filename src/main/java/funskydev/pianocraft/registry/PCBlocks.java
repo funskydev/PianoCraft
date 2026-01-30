@@ -55,7 +55,7 @@ public class PCBlocks {
     private static <T extends Block> T registerBlock(String name, T block, boolean registerBlockItem) {
 
         if (registerBlockItem) registerBlockItem(name, block);
-        return Registry.register(BuiltInRegistries.BLOCK, new Identifier(PCMain.MOD_ID, name), block);
+        return Registry.register(BuiltInRegistries.BLOCK, Identifier.fromNamespaceAndPath(PCMain.MOD_ID, name), block);
 
     }
 
@@ -80,7 +80,7 @@ public class PCBlocks {
 
     private static void registerBlockItem(String name, BlockItem blockItem) {
 
-        Item item = Registry.register(BuiltInRegistries.ITEM, new Identifier(PCMain.MOD_ID, name), blockItem);
+        Item item = Registry.register(BuiltInRegistries.ITEM, Identifier.fromNamespaceAndPath(PCMain.MOD_ID, name), blockItem);
         ItemGroupEvents.modifyEntriesEvent(CreativeModeTabs.FUNCTIONAL_BLOCKS).register(entries -> entries.addAfter(Items.JUKEBOX, item));
 
     }

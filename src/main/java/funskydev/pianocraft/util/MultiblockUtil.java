@@ -132,7 +132,7 @@ public class MultiblockUtil {
 
         for(Map.Entry<BlockPos, BlockPosEnum> entry : blocks.entrySet()) {
 
-            Block newBlock = BuiltInRegistries.BLOCK.getValue(new Identifier(PCMain.MOD_ID, multiBlockEnum.getName(entry.getValue())));
+            Block newBlock = BuiltInRegistries.BLOCK.getValue(Identifier.fromNamespaceAndPath(PCMain.MOD_ID, multiBlockEnum.getName(entry.getValue())));
             if(newBlock == null) return;
             if(world.isEmptyBlock(entry.getKey())) world.setBlockAndUpdate(entry.getKey(), newBlock.defaultBlockState().setValue(HorizontalDirectionalBlock.FACING, facing));
 
