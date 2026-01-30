@@ -1,38 +1,37 @@
 package funskydev.pianocraft.mixin.client;
 
+import com.mojang.blaze3d.vertex.PoseStack;
 import funskydev.pianocraft.screen.PianoScreenHandler;
-import net.minecraft.client.network.AbstractClientPlayerEntity;
-import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.client.render.VertexConsumerProvider;
-import net.minecraft.client.render.item.HeldItemRenderer;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.Arm;
-import net.minecraft.util.Hand;
+import net.minecraft.client.player.AbstractClientPlayer;
+import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.client.renderer.ItemInHandRenderer;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.item.ItemStack;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-@Mixin(HeldItemRenderer.class)
+@Mixin(ItemInHandRenderer.class)
 public abstract class HeldItemRendererMixin {
 
-    @Inject(at = @At("HEAD"), method = "getHandRenderType", cancellable = true)
-    private static void getHandRenderType(ClientPlayerEntity player, CallbackInfoReturnable<HeldItemRenderer.HandRenderType> info) {
+    @Inject(at = @At("HEAD"), method = "evaluateWhichHandsToRender", cancellable = true)
+    private static void getHandRenderType(LocalPlayer player, CallbackInfoReturnable<ItemInHandRenderer.HandRenderSelection> info) {
 
-        if (player.currentScreenHandler instanceof PianoScreenHandler) info.setReturnValue(HeldItemRenderer.HandRenderType.RENDER_BOTH_HANDS);
+        if (player.containerMenu instanceof PianoScreenHandler) info.setReturnValue(ItemInHandRenderer.HandRenderSelection.RENDER_BOTH_HANDS);
 
     }
 
-    @Inject(at = @At("HEAD"), method = "renderFirstPersonItem", cancellable = true)
-    private void renderFirstPersonItem(AbstractClientPlayerEntity player, float tickDelta, float pitch, Hand hand, float swingProgress, ItemStack item, float equipProgress, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, CallbackInfo info) {
+    @Inject(at = @At("HEAD"), method = "renderArmWithItem", cancellable = true)
+    private void renderFirstPersonItem(AbstractClientPlayer player, float tickDelta, float pitch, InteractionHand hand, float swingProgress, ItemStack item, float equipProgress, PoseStack matrices, MultiBufferSource vertexConsumers, int light, CallbackInfo info) {
 
-        if (hand != Hand.MAIN_HAND && item.isEmpty() && player.currentScreenHandler instanceof PianoScreenHandler) {
+        if (hand != InteractionHand.MAIN_HAND && item.isEmpty() && player.containerMenu instanceof PianoScreenHandler) {
 
-            matrices.push();
-            ((HeldItemRenderer) (Object) this).renderArmHoldingItem(matrices, vertexConsumers, light, equipProgress, swingProgress, player.getMainArm().getOpposite());
-            matrices.pop();
+            matrices.pushPose();
+            ((ItemInHandRenderer) (Object) this).renderPlayerArm(matrices, vertexConsumers, light, equipProgress, swingProgress, player.getMainArm().getOpposite());
+            matrices.popPose();
             info.cancel();
             
         }

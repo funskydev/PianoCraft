@@ -5,22 +5,27 @@ import funskydev.pianocraft.util.MultiblockEnum;
 import funskydev.pianocraft.util.MultiblockUtil;
 import funskydev.pianocraft.util.VoxelShapeUtil;
 import net.minecraft.block.*;
-import net.minecraft.block.piston.PistonBehavior;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemPlacementContext;
-import net.minecraft.item.ItemStack;
-import net.minecraft.state.StateManager;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.shape.VoxelShape;
-import net.minecraft.world.BlockView;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.HorizontalDirectionalBlock;
+import net.minecraft.world.level.block.state.BlockBehaviour;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.material.PushReaction;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.Nullable;
 
-public abstract class MultiblockMainPartBlock extends HorizontalFacingBlock {
+public abstract class MultiblockMainPartBlock extends HorizontalDirectionalBlock {
 
     private final MultiblockEnum multiblockType;
 
@@ -29,9 +34,9 @@ public abstract class MultiblockMainPartBlock extends HorizontalFacingBlock {
     private final VoxelShape southShape;
     private final VoxelShape westShape;
 
-    protected MultiblockMainPartBlock(AbstractBlock.Settings settings, MultiblockEnum multiblockType) {
+    protected MultiblockMainPartBlock(BlockBehaviour.Properties settings, MultiblockEnum multiblockType) {
 
-        super(settings.pistonBehavior(PistonBehavior.BLOCK));
+        super(settings.pushReaction(PushReaction.BLOCK));
 
         this.multiblockType = multiblockType;
         this.northShape = multiblockType.getMainBlockShape();
@@ -46,26 +51,26 @@ public abstract class MultiblockMainPartBlock extends HorizontalFacingBlock {
     // Behaviors
 
     @Override
-    public abstract ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult hit);
+    public abstract InteractionResult useWithoutItem(BlockState state, Level world, BlockPos pos, Player player, BlockHitResult hit);
 
     @Override
-    public void onPlaced(World world, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack itemStack) {
-        super.onPlaced(world, pos, state, placer, itemStack);
+    public void setPlacedBy(Level world, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack itemStack) {
+        super.setPlacedBy(world, pos, state, placer, itemStack);
 
-        if (!world.isClient()) placeMultiblockParts(world, pos, state);
+        if (!world.isClientSide()) placeMultiblockParts(world, pos, state);
     }
 
     @Override
-    public void onStateReplaced(BlockState state, World world, BlockPos pos, BlockState newState, boolean moved) {
-        super.onStateReplaced(state, world, pos, newState, moved);
+    public void onStateReplaced(BlockState state, Level world, BlockPos pos, BlockState newState, boolean moved) {
+        super.affectNeighborsAfterRemoval(state, world, pos, newState, moved);
 
-        if (!state.isOf(newState.getBlock())) destroyMultiblockParts(world, pos, state);
+        if (!state.is(newState.getBlock())) destroyMultiblockParts(world, pos, state);
     }
 
     @Override
-    public VoxelShape getOutlineShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
+    public VoxelShape getShape(BlockState state, BlockGetter world, BlockPos pos, CollisionContext context) {
 
-        switch (state.get(FACING)) {
+        switch (state.getValue(FACING)) {
             case EAST:
                 return eastShape;
             case SOUTH:
@@ -81,34 +86,34 @@ public abstract class MultiblockMainPartBlock extends HorizontalFacingBlock {
     // Facing
 
     @Override
-    public BlockState getPlacementState(ItemPlacementContext ctx) {
-        return this.getDefaultState().with(FACING, ctx.getHorizontalPlayerFacing().getOpposite());
+    public BlockState getStateForPlacement(BlockPlaceContext ctx) {
+        return this.defaultBlockState().setValue(FACING, ctx.getHorizontalDirection().getOpposite());
     }
 
     @Override
-    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         builder.add(FACING);
     }
 
     // Registry
 
     @Override
-    public abstract MapCodec<? extends HorizontalFacingBlock> getCodec();
+    public abstract MapCodec<? extends HorizontalDirectionalBlock> codec();
 
     // Multiblock main part methods
 
-    public void placeMultiblockParts(World world, BlockPos pos, BlockState state) {
+    public void placeMultiblockParts(Level world, BlockPos pos, BlockState state) {
 
-        Direction facing = state.get(FACING);
+        Direction facing = state.getValue(FACING);
         MultiblockUtil.placeBlockMap(world, MultiblockUtil.getMultBlocks(pos, facing, multiblockType), facing, multiblockType);
 
     }
 
-    public void destroyMultiblockParts(World world, BlockPos pos, BlockState state) {
+    public void destroyMultiblockParts(Level world, BlockPos pos, BlockState state) {
 
-        world.breakBlock(pos, true);
+        world.destroyBlock(pos, true);
 
-        Direction facing = state.get(FACING);
+        Direction facing = state.getValue(FACING);
         MultiblockUtil.attemptDestruction(world, MultiblockUtil.getMultBlocks(pos, facing, multiblockType));
 
     }

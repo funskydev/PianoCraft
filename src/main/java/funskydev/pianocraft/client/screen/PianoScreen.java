@@ -1,5 +1,6 @@
 package funskydev.pianocraft.client.screen;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import funskydev.pianocraft.PCMain;
 import funskydev.pianocraft.client.PCMainClient;
 import funskydev.pianocraft.network.PianoKeyPressedPayload;
@@ -7,36 +8,35 @@ import funskydev.pianocraft.screen.PianoScreenHandler;
 import funskydev.pianocraft.util.NoteUtil;
 import funskydev.pianocraft.util.NotesEnum;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.screen.ingame.HandledScreen;
-import net.minecraft.client.gui.screen.narration.NarrationMessageBuilder;
-import net.minecraft.client.gui.tooltip.Tooltip;
-import net.minecraft.client.gui.widget.PressableWidget;
-import net.minecraft.client.gui.widget.TextWidget;
-import net.minecraft.client.util.InputUtil;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.sound.SoundEvents;
-import net.minecraft.text.Text;
-import net.minecraft.util.Hand;
-import net.minecraft.util.Identifier;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.AbstractButton;
+import net.minecraft.client.gui.components.StringWidget;
+import net.minecraft.client.gui.components.Tooltip;
+import net.minecraft.client.gui.narration.NarrationElementOutput;
+import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.Identifier;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.player.Inventory;
 import org.lwjgl.glfw.GLFW;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class PianoScreen extends HandledScreen<PianoScreenHandler> {
+public class PianoScreen extends AbstractContainerScreen<PianoScreenHandler> {
 
     private static final Identifier TEXTURE = new Identifier(PCMain.MOD_ID, "textures/gui/piano.png");
 
-    private PressableWidget midiDeviceButton;
-    private List<TextWidget> keyWidgets = new ArrayList<>();
-    private TextWidget hideKeysText;
-    private TextWidget arrowsText;
+    private AbstractButton midiDeviceButton;
+    private List<StringWidget> keyWidgets = new ArrayList<>();
+    private StringWidget hideKeysText;
+    private StringWidget arrowsText;
 
     private int octave = 3;
     private boolean showKeybindings;
 
-    public PianoScreen(PianoScreenHandler handler, PlayerInventory inventory, Text title) {
+    public PianoScreen(PianoScreenHandler handler, Inventory inventory, Component title) {
         super(handler, inventory, title);
     }
 
@@ -46,11 +46,11 @@ public class PianoScreen extends HandledScreen<PianoScreenHandler> {
 
         this.keyWidgets.clear();
 
-        this.addDrawableChild(new TextWidget(10, 10, 120, 0, Text.of("Piano menu"), this.textRenderer));
+        this.addRenderableWidget(new StringWidget(10, 10, 120, 0, Component.nullToEmpty("Piano menu"), this.font));
 
-        this.midiDeviceButton = new PressableWidget(10, 20, 120, 20, Text.of("Unknown")) {
+        this.midiDeviceButton = new AbstractButton(10, 20, 120, 20, Component.nullToEmpty("Unknown")) {
             @Override
-            protected void appendClickableNarrations(NarrationMessageBuilder builder) {
+            protected void updateWidgetNarration(NarrationElementOutput builder) {
 
             }
 
@@ -60,7 +60,7 @@ public class PianoScreen extends HandledScreen<PianoScreenHandler> {
             }
         };
 
-        this.addDrawableChild(this.midiDeviceButton);
+        this.addRenderableWidget(this.midiDeviceButton);
 
         for (int i = 0; i < 12; i++) {
 
@@ -80,19 +80,19 @@ public class PianoScreen extends HandledScreen<PianoScreenHandler> {
 
             int y = isSharp ? 73 : 95;
 
-            TextWidget keyWidget = new TextWidget(x, y, 10, 10, Text.of(""), this.textRenderer);
+            StringWidget keyWidget = new StringWidget(x, y, 10, 10, Component.nullToEmpty(""), this.font);
             keyWidget.setTextColor(0xFFAA00);
 
-            this.addDrawableChild(keyWidget);
+            this.addRenderableWidget(keyWidget);
             this.keyWidgets.add(keyWidget);
 
         }
 
-        this.hideKeysText = new TextWidget(10, 50, 120, 0, Text.of(""), this.textRenderer);
-        this.addDrawableChild(this.hideKeysText);
+        this.hideKeysText = new StringWidget(10, 50, 120, 0, Component.nullToEmpty(""), this.font);
+        this.addRenderableWidget(this.hideKeysText);
 
-        this.arrowsText = new TextWidget(10, 118, 120, 0, Text.of("Arrows - Change octave"), this.textRenderer);
-        this.addDrawableChild(this.arrowsText);
+        this.arrowsText = new StringWidget(10, 118, 120, 0, Component.nullToEmpty("Arrows - Change octave"), this.font);
+        this.addRenderableWidget(this.arrowsText);
 
         PCMainClient.searchForMidiDeviceIfNoneSelected();
         PCMainClient.ensureCurrentMidiDeviceIsAvailableAndReady();
@@ -103,30 +103,30 @@ public class PianoScreen extends HandledScreen<PianoScreenHandler> {
     }
 
     @Override
-    public void close() {
-        super.close();
+    public void onClose() {
+        super.onClose();
 
         PCMainClient.closeCurrentMidiDevice();
     }
 
     @Override
-    protected void drawBackground(DrawContext context, float delta, int mouseX, int mouseY) {
+    protected void renderBg(GuiGraphics context, float delta, int mouseX, int mouseY) {
         if (!showKeybindings) return;
-        context.drawTexture(TEXTURE, 6, 45, 0, 0, 0, 128, 64, 128, 64);
+        context.blit(TEXTURE, 6, 45, 0, 0, 0, 128, 64, 128, 64);
     }
 
     @Override
-    protected void drawForeground(DrawContext context, int mouseX, int mouseY) {
+    protected void renderLabels(GuiGraphics context, int mouseX, int mouseY) {
 
     }
 
     @Override
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
 
-        InputUtil.Key pressedKey = InputUtil.fromKeyCode(keyCode, scanCode);
+        InputConstants.Key pressedKey = InputConstants.getKey(keyCode, scanCode);
 
         if (keyCode == GLFW.GLFW_KEY_ESCAPE) {
-            this.close();
+            this.onClose();
             return true;
         }
 
@@ -150,7 +150,7 @@ public class PianoScreen extends HandledScreen<PianoScreenHandler> {
         }
 
         for(KeysEnum key : KeysEnum.values()) {
-            if (pressedKey.getTranslationKey().equals(key.getTranslationKey())) {
+            if (pressedKey.getName().equals(key.getTranslationKey())) {
                 playNote(key.getNote(), key.getOctave());
             }
         }
@@ -170,8 +170,8 @@ public class PianoScreen extends HandledScreen<PianoScreenHandler> {
     private void playNoteOnClient(NotesEnum note, int octave, float volume) {
 
         float pitch = NoteUtil.getPitchFromNoteAndOctave(note, octave);
-        client.player.playSound(SoundEvents.BLOCK_NOTE_BLOCK_HARP.value(), volume, pitch);
-        client.player.swingHand(Hand.values()[client.player.getRandom().nextInt(Hand.values().length)]);
+        minecraft.player.playSound(SoundEvents.NOTE_BLOCK_HARP.value(), volume, pitch);
+        minecraft.player.swing(InteractionHand.values()[minecraft.player.getRandom().nextInt(InteractionHand.values().length)]);
 
     }
 
@@ -196,8 +196,8 @@ public class PianoScreen extends HandledScreen<PianoScreenHandler> {
             tooltipText = "Click to refresh MIDI devices";
         }
 
-        this.midiDeviceButton.setMessage(Text.of(currentMidiDeviceName));
-        this.midiDeviceButton.setTooltip(Tooltip.of(Text.of(tooltipText)));
+        this.midiDeviceButton.setMessage(Component.nullToEmpty(currentMidiDeviceName));
+        this.midiDeviceButton.setTooltip(Tooltip.create(Component.nullToEmpty(tooltipText)));
 
     }
 
@@ -217,10 +217,10 @@ public class PianoScreen extends HandledScreen<PianoScreenHandler> {
                 continue;
             }
 
-            InputUtil.Key keyboardKey = InputUtil.fromTranslationKey(key.getTranslationKey());
+            InputConstants.Key keyboardKey = InputConstants.getKey(key.getTranslationKey());
 
-            this.keyWidgets.get(i).setMessage(Text.of(keyboardKey.getLocalizedText().getString().toUpperCase()));
-            this.keyWidgets.get(i).setTooltip(Tooltip.of(Text.of(NotesEnum.getNote(i).getNoteName() + octave)));
+            this.keyWidgets.get(i).setMessage(Component.nullToEmpty(keyboardKey.getDisplayName().getString().toUpperCase()));
+            this.keyWidgets.get(i).setTooltip(Tooltip.create(Component.nullToEmpty(NotesEnum.getNote(i).getNoteName() + octave)));
 
         }
 
@@ -229,10 +229,10 @@ public class PianoScreen extends HandledScreen<PianoScreenHandler> {
     private void updateInfoTextWidget() {
 
         if (showKeybindings) {
-            this.hideKeysText.setMessage(Text.of("TAB - Hide keybindings"));
+            this.hideKeysText.setMessage(Component.nullToEmpty("TAB - Hide keybindings"));
             this.hideKeysText.setY(130);
         } else {
-            this.hideKeysText.setMessage(Text.of("TAB - Show keybindings"));
+            this.hideKeysText.setMessage(Component.nullToEmpty("TAB - Show keybindings"));
             this.hideKeysText.setY(50);
         }
 

@@ -4,71 +4,65 @@ import funskydev.pianocraft.PCMain;
 import funskydev.pianocraft.registry.PCScreenHandlers;
 import funskydev.pianocraft.util.NoteUtil;
 import funskydev.pianocraft.util.NotesEnum;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.Inventory;
-import net.minecraft.inventory.SimpleInventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.screen.ScreenHandler;
-import net.minecraft.screen.ScreenHandlerContext;
-import net.minecraft.screen.ScreenHandlerType;
-import net.minecraft.screen.slot.Slot;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.sound.SoundCategory;
-import net.minecraft.sound.SoundEvents;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.Container;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
 
-public class PianoScreenHandler extends ScreenHandler {
+public class PianoScreenHandler extends AbstractContainerMenu {
 
-    private final Inventory inventory;
+    private final Container inventory;
     private BlockPos pos;
 
     /*public PianoScreenHandler(int syncId) {
         this(syncId, new SimpleInventory(1));
     }*/
 
-    public PianoScreenHandler(int syncId, Inventory inventory) {
+    public PianoScreenHandler(int syncId, Container inventory) {
         super(PCScreenHandlers.PIANO_SCREEN_HANDLER, syncId);
         this.inventory = inventory;
     }
 
-    public PianoScreenHandler(int syncId, Inventory inventory, BlockPos pos) {
+    public PianoScreenHandler(int syncId, Container inventory, BlockPos pos) {
         super(PCScreenHandlers.PIANO_SCREEN_HANDLER, syncId);
         this.inventory = inventory;
         this.pos = pos;
     }
 
     @Override
-    public boolean onButtonClick(PlayerEntity player, int id) {
+    public boolean clickMenuButton(Player player, int id) {
 
-        if (player.getWorld() instanceof ServerWorld serverWorld) {
+        if (player.getWorld() instanceof ServerLevel serverWorld) {
 
             NotesEnum note = NoteUtil.getNoteFromId(id);
             int octave = NoteUtil.getOctaveFromId(id);
             float pitch = NoteUtil.getPitchFromNoteAndOctave(note, octave);
 
-            serverWorld.playSound(player, player.getBlockPos(), SoundEvents.BLOCK_NOTE_BLOCK_HARP.value(), SoundCategory.RECORDS, 1.0f, pitch);
+            serverWorld.playSound(player, player.blockPosition(), SoundEvents.NOTE_BLOCK_HARP.value(), SoundSource.RECORDS, 1.0f, pitch);
 
             return true;
         }
 
-        return super.onButtonClick(player, id);
+        return super.clickMenuButton(player, id);
     }
 
     @Override
-    public ItemStack quickMove(PlayerEntity player, int slot) {
+    public ItemStack quickMoveStack(Player player, int slot) {
         return ItemStack.EMPTY;
     }
 
     @Override
-    public boolean canUse(PlayerEntity player) {
-        return this.inventory.canPlayerUse(player);
+    public boolean stillValid(Player player) {
+        return this.inventory.stillValid(player);
     }
 
     public ItemStack getSoundItemStack() {
-        return this.inventory.getStack(0);
+        return this.inventory.getItem(0);
     }
 
     public BlockPos getPianoPos() {

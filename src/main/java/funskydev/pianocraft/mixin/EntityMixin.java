@@ -4,12 +4,6 @@ import funskydev.pianocraft.PCMain;
 import funskydev.pianocraft.block.MultiblockPartBlock;
 import funskydev.pianocraft.block.PianoBlock;
 import funskydev.pianocraft.util.NoteUtil;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.Entity;
-import net.minecraft.sound.SoundCategory;
-import net.minecraft.sound.SoundEvents;
-import net.minecraft.util.math.BlockPos;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Accessor;
 import org.spongepowered.asm.mixin.injection.At;
@@ -17,11 +11,17 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.Random;
+import net.minecraft.core.BlockPos;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
 
 @Mixin(Entity.class)
 public abstract class EntityMixin {
 
-    @Inject(at = @At("RETURN"), method = "playStepSounds")
+    @Inject(at = @At("RETURN"), method = "walkingStepSound")
     private void playStepSounds(BlockPos pos, BlockState state, CallbackInfo info) {
 
         Entity entity = (Entity) (Object) this;
@@ -44,7 +44,7 @@ public abstract class EntityMixin {
 
             float pitch = NoteUtil.getPitchFromNoteAndOctave(note, octave);
 
-            entity.getWorld().playSound(null, pos, SoundEvents.BLOCK_NOTE_BLOCK_HARP.value(), SoundCategory.RECORDS, volume, pitch);
+            entity.getWorld().playSound(null, pos, SoundEvents.NOTE_BLOCK_HARP.value(), SoundSource.RECORDS, volume, pitch);
         }
     }
 

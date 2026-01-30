@@ -2,21 +2,21 @@ package funskydev.pianocraft.registry;
 
 import funskydev.pianocraft.PCMain;
 import funskydev.pianocraft.screen.PianoScreenHandler;
-import net.minecraft.registry.Registries;
-import net.minecraft.registry.Registry;
-import net.minecraft.resource.featuretoggle.FeatureFlags;
-import net.minecraft.screen.ScreenHandler;
-import net.minecraft.screen.ScreenHandlerType;
-import net.minecraft.util.Identifier;
+import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.Identifier;
+import net.minecraft.world.flag.FeatureFlags;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.MenuType;
 
 public class PCScreenHandlers {
 
-    public static final ScreenHandlerType<PianoScreenHandler> PIANO_SCREEN_HANDLER = registerScreenHandler("piano", PianoScreenHandler::new);
+    public static final MenuType<PianoScreenHandler> PIANO_SCREEN_HANDLER = registerScreenHandler("piano", PianoScreenHandler::new);
 
-    private static <S extends ScreenHandler> ScreenHandlerType<S> registerScreenHandler(String name, ScreenHandlerType.Factory<S> screenHandlerFactory) {
-        return Registry.register(Registries.SCREEN_HANDLER,
+    private static <S extends AbstractContainerMenu> MenuType<S> registerScreenHandler(String name, MenuType.MenuSupplier<S> screenHandlerFactory) {
+        return Registry.register(BuiltInRegistries.MENU,
                 new Identifier(PCMain.MOD_ID, "piano"),
-                new ScreenHandlerType<>(screenHandlerFactory,FeatureFlags.VANILLA_FEATURES));
+                new MenuType<>(screenHandlerFactory,FeatureFlags.VANILLA_SET));
     }
 
     public static void registerScreenHandlers() {

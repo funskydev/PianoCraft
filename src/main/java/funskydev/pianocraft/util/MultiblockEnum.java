@@ -1,26 +1,25 @@
 package funskydev.pianocraft.util;
 
 import funskydev.pianocraft.block.MultiblockMainPartBlock;
-import net.minecraft.block.Block;
-import net.minecraft.util.function.BooleanBiFunction;
-import net.minecraft.util.shape.VoxelShape;
-import net.minecraft.util.shape.VoxelShapes;
-
 import java.util.*;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.phys.shapes.BooleanOp;
+import net.minecraft.world.phys.shapes.Shapes;
+import net.minecraft.world.phys.shapes.VoxelShape;
 
 public enum MultiblockEnum {
 
     PIANO(new LinkedHashMap<>() {{
-            put(BlockPosEnum.EAST,VoxelShapes.combineAndSimplify(Block.createCuboidShape(0,0,1,8,15,16),Block.createCuboidShape(0,15,9,8,16,16),BooleanBiFunction.OR));
-            put(BlockPosEnum.WEST,VoxelShapes.combineAndSimplify(Block.createCuboidShape(8,0,1,16,15,16),Block.createCuboidShape(8,15,9,16,16,16),BooleanBiFunction.OR));
-            put(BlockPosEnum.TOP,Block.createCuboidShape(0,0,9,16,9,16));
-            put(BlockPosEnum.TOP_EAST,Block.createCuboidShape(0,0,9,8,9,16));
-            put(BlockPosEnum.TOP_WEST,Block.createCuboidShape(8,0,9,16,9,16));
-    }}, VoxelShapes.combineAndSimplify(Block.createCuboidShape(0, 0, 1, 16, 15, 16), Block.createCuboidShape(0, 15, 9, 16, 16, 16), BooleanBiFunction.OR));
+            put(BlockPosEnum.EAST,Shapes.join(Block.box(0,0,1,8,15,16),Block.box(0,15,9,8,16,16),BooleanOp.OR));
+            put(BlockPosEnum.WEST,Shapes.join(Block.box(8,0,1,16,15,16),Block.box(8,15,9,16,16,16),BooleanOp.OR));
+            put(BlockPosEnum.TOP,Block.box(0,0,9,16,9,16));
+            put(BlockPosEnum.TOP_EAST,Block.box(0,0,9,8,9,16));
+            put(BlockPosEnum.TOP_WEST,Block.box(8,0,9,16,9,16));
+    }}, Shapes.join(Block.box(0, 0, 1, 16, 15, 16), Block.box(0, 15, 9, 16, 16, 16), BooleanOp.OR));
 
     private Map<BlockPosEnum, VoxelShape> blocks;
     private MultiblockMainPartBlock mainBlock;
-    private VoxelShape mainBlockShape = VoxelShapes.fullCube();
+    private VoxelShape mainBlockShape = Shapes.block();
 
     MultiblockEnum(LinkedHashMap<BlockPosEnum, VoxelShape> blocks, VoxelShape mainBlockShape) {
         this.blocks = blocks;
@@ -33,7 +32,7 @@ public enum MultiblockEnum {
 
     MultiblockEnum(List<BlockPosEnum> blocks) {
         this.blocks = new LinkedHashMap<>();
-        for (BlockPosEnum pos : blocks) this.blocks.put(pos, VoxelShapes.fullCube());
+        for (BlockPosEnum pos : blocks) this.blocks.put(pos, Shapes.block());
     }
 
     public Map<BlockPosEnum, VoxelShape> getBlocks() {

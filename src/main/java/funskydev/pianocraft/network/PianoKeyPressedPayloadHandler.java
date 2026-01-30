@@ -3,10 +3,10 @@ package funskydev.pianocraft.network;
 import funskydev.pianocraft.screen.PianoScreenHandler;
 import funskydev.pianocraft.util.NoteUtil;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.sound.SoundCategory;
-import net.minecraft.sound.SoundEvents;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 
 public class PianoKeyPressedPayloadHandler implements ServerPlayNetworking.PlayPayloadHandler<PianoKeyPressedPayload> {
 
@@ -15,9 +15,9 @@ public class PianoKeyPressedPayloadHandler implements ServerPlayNetworking.PlayP
 
         if (context.player() == null) return;
 
-        ServerPlayerEntity player = context.player();
+        ServerPlayer player = context.player();
 
-        if (player.currentScreenHandler instanceof PianoScreenHandler pianoScreenHandler) {
+        if (player.containerMenu instanceof PianoScreenHandler pianoScreenHandler) {
 
             BlockPos pianoPos = pianoScreenHandler.getPianoPos();
 
@@ -25,8 +25,8 @@ public class PianoKeyPressedPayloadHandler implements ServerPlayNetworking.PlayP
 
             float pitch = NoteUtil.getPitchFromNoteAndOctave(payload.note(), payload.octave());
 
-            player.getServerWorld().playSound(player, pianoPos, SoundEvents.BLOCK_NOTE_BLOCK_HARP.value(),
-                    SoundCategory.RECORDS, payload.volume(), pitch);
+            player.getServerWorld().playSound(player, pianoPos, SoundEvents.NOTE_BLOCK_HARP.value(),
+                    SoundSource.RECORDS, payload.volume(), pitch);
 
         }
 

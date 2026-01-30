@@ -2,16 +2,16 @@ package funskydev.pianocraft.item;
 
 import funskydev.pianocraft.util.MultiblockEnum;
 import funskydev.pianocraft.util.MultiblockUtil;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.item.BlockItem;
-import net.minecraft.item.ItemPlacementContext;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
 
 public class MultiblockItem extends BlockItem {
 
     private final MultiblockEnum multiblockType;
 
-    public MultiblockItem(Block block, Settings settings, MultiblockEnum multiblockType) {
+    public MultiblockItem(Block block, Properties settings, MultiblockEnum multiblockType) {
 
         super(block, settings);
         this.multiblockType = multiblockType;
@@ -19,11 +19,11 @@ public class MultiblockItem extends BlockItem {
     }
 
     @Override
-    protected boolean canPlace(ItemPlacementContext ctx, BlockState state) {
+    protected boolean canPlace(BlockPlaceContext ctx, BlockState state) {
 
         // TODO: check for plants etc
 
-        boolean result = MultiblockUtil.checkAround(ctx.getWorld(), MultiblockUtil.getMultBlocks(ctx.getBlockPos(), ctx.getHorizontalPlayerFacing().getOpposite(), multiblockType));
+        boolean result = MultiblockUtil.checkAround(ctx.getLevel(), MultiblockUtil.getMultBlocks(ctx.getClickedPos(), ctx.getHorizontalDirection().getOpposite(), multiblockType));
         return result && super.canPlace(ctx, state);
 
     }

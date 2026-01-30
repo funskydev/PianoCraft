@@ -8,22 +8,21 @@ import funskydev.pianocraft.item.MultiblockItem;
 import funskydev.pianocraft.util.BlockPosEnum;
 import funskydev.pianocraft.util.MultiblockEnum;
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
-import net.minecraft.block.AbstractBlock;
-import net.minecraft.block.Block;
-import net.minecraft.item.BlockItem;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemGroups;
-import net.minecraft.item.Items;
-import net.minecraft.registry.Registries;
-import net.minecraft.registry.Registry;
-import net.minecraft.util.Identifier;
-
+import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.Identifier;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.CreativeModeTabs;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockBehaviour;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class PCBlocks {
 
-    public static final MultiblockMainPartBlock PIANO = registerMultiblockWithItem("piano", new PianoBlock(AbstractBlock.Settings.create()));
+    public static final MultiblockMainPartBlock PIANO = registerMultiblockWithItem("piano", new PianoBlock(BlockBehaviour.Properties.of()));
 
     public static Map<MultiblockPartBlock, MultiblockMainPartBlock> MULTIBLOCKS = new LinkedHashMap<>();
 
@@ -56,7 +55,7 @@ public class PCBlocks {
     private static <T extends Block> T registerBlock(String name, T block, boolean registerBlockItem) {
 
         if (registerBlockItem) registerBlockItem(name, block);
-        return Registry.register(Registries.BLOCK, new Identifier(PCMain.MOD_ID, name), block);
+        return Registry.register(BuiltInRegistries.BLOCK, new Identifier(PCMain.MOD_ID, name), block);
 
     }
 
@@ -69,20 +68,20 @@ public class PCBlocks {
 
     private static <T extends MultiblockMainPartBlock> T registerMultiblockWithItem(String name, T block) {
 
-        return registerBlockWithBlockItem(name, block, new MultiblockItem(block, new Item.Settings(), block.getMultiblockType()));
+        return registerBlockWithBlockItem(name, block, new MultiblockItem(block, new Item.Properties(), block.getMultiblockType()));
 
     }
 
     private static void registerBlockItem(String name, Block block) {
 
-        registerBlockItem(name, new BlockItem(block, new Item.Settings()));
+        registerBlockItem(name, new BlockItem(block, new Item.Properties()));
 
     }
 
     private static void registerBlockItem(String name, BlockItem blockItem) {
 
-        Item item = Registry.register(Registries.ITEM, new Identifier(PCMain.MOD_ID, name), blockItem);
-        ItemGroupEvents.modifyEntriesEvent(ItemGroups.FUNCTIONAL).register(entries -> entries.addAfter(Items.JUKEBOX, item));
+        Item item = Registry.register(BuiltInRegistries.ITEM, new Identifier(PCMain.MOD_ID, name), blockItem);
+        ItemGroupEvents.modifyEntriesEvent(CreativeModeTabs.FUNCTIONAL_BLOCKS).register(entries -> entries.addAfter(Items.JUKEBOX, item));
 
     }
 

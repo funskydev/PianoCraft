@@ -2,16 +2,15 @@ package funskydev.pianocraft.util;
 
 import funskydev.pianocraft.PCMain;
 import funskydev.pianocraft.block.MultiblockPartBlock;
-import net.minecraft.block.Block;
-import net.minecraft.block.HorizontalFacingBlock;
-import net.minecraft.registry.Registries;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.world.World;
-
 import java.util.HashMap;
 import java.util.Map;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.Identifier;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.HorizontalDirectionalBlock;
 
 public class MultiblockUtil {
 
@@ -22,7 +21,7 @@ public class MultiblockUtil {
         switch(position) {
 
             case TOP:
-                newPos = source.down();
+                newPos = source.below();
                 break;
 
             case EAST:
@@ -34,11 +33,11 @@ public class MultiblockUtil {
                 break;
 
             case TOP_WEST:
-                newPos = translateWithRotation(source, Direction.EAST, facing).down();
+                newPos = translateWithRotation(source, Direction.EAST, facing).below();
                 break;
 
             case TOP_EAST:
-                newPos = translateWithRotation(source, Direction.WEST, facing).down();
+                newPos = translateWithRotation(source, Direction.WEST, facing).below();
                 break;
 
         }
@@ -59,11 +58,11 @@ public class MultiblockUtil {
 
         } else if (facing == Direction.EAST) {
 
-            newPos = translatePos(source, direction.rotateClockwise(Direction.Axis.Y));
+            newPos = translatePos(source, direction.getClockWise(Direction.Axis.Y));
 
         } else if (facing == Direction.WEST) {
 
-            newPos = translatePos(source, direction.rotateClockwise(Direction.Axis.Y).rotateClockwise(Direction.Axis.Y).rotateClockwise(Direction.Axis.Y));
+            newPos = translatePos(source, direction.getClockWise(Direction.Axis.Y).getClockWise(Direction.Axis.Y).getClockWise(Direction.Axis.Y));
 
         }
 
@@ -113,13 +112,13 @@ public class MultiblockUtil {
                     blocks.put(translateWithRotation(source, Direction.EAST, mainBlockFacing), pos);
                     break;
                 case TOP:
-                    blocks.put(source.up(), pos);
+                    blocks.put(source.above(), pos);
                     break;
                 case TOP_WEST:
-                    blocks.put(translateWithRotation(source, Direction.WEST, mainBlockFacing).up(), pos);
+                    blocks.put(translateWithRotation(source, Direction.WEST, mainBlockFacing).above(), pos);
                     break;
                 case TOP_EAST:
-                    blocks.put(translateWithRotation(source, Direction.EAST, mainBlockFacing).up(), pos);
+                    blocks.put(translateWithRotation(source, Direction.EAST, mainBlockFacing).above(), pos);
                     break;
             }
 
@@ -129,23 +128,23 @@ public class MultiblockUtil {
 
     }
 
-    public static void placeBlockMap(World world, Map<BlockPos, BlockPosEnum> blocks, Direction facing, MultiblockEnum multiBlockEnum) {
+    public static void placeBlockMap(Level world, Map<BlockPos, BlockPosEnum> blocks, Direction facing, MultiblockEnum multiBlockEnum) {
 
         for(Map.Entry<BlockPos, BlockPosEnum> entry : blocks.entrySet()) {
 
-            Block newBlock = Registries.BLOCK.get(new Identifier(PCMain.MOD_ID, multiBlockEnum.getName(entry.getValue())));
+            Block newBlock = BuiltInRegistries.BLOCK.getValue(new Identifier(PCMain.MOD_ID, multiBlockEnum.getName(entry.getValue())));
             if(newBlock == null) return;
-            if(world.isAir(entry.getKey())) world.setBlockState(entry.getKey(), newBlock.getDefaultState().with(HorizontalFacingBlock.FACING, facing));
+            if(world.isEmptyBlock(entry.getKey())) world.setBlockAndUpdate(entry.getKey(), newBlock.defaultBlockState().setValue(HorizontalDirectionalBlock.FACING, facing));
 
         }
 
     }
 
-    public static boolean checkAround(World world, Map<BlockPos, BlockPosEnum> blocks) {
+    public static boolean checkAround(Level world, Map<BlockPos, BlockPosEnum> blocks) {
 
         for(Map.Entry<BlockPos, BlockPosEnum> entry : blocks.entrySet()) {
 
-            if(!world.isAir(entry.getKey())) return false;
+            if(!world.isEmptyBlock(entry.getKey())) return false;
 
         }
 
@@ -153,13 +152,13 @@ public class MultiblockUtil {
 
     }
 
-    public static void attemptDestruction(World world, Map<BlockPos, BlockPosEnum> blocks) {
+    public static void attemptDestruction(Level world, Map<BlockPos, BlockPosEnum> blocks) {
 
         for(Map.Entry<BlockPos, BlockPosEnum> entry : blocks.entrySet()) {
 
             if(world.getBlockState(entry.getKey()).getBlock() instanceof MultiblockPartBlock) {
 
-                world.breakBlock(entry.getKey(), false);
+                world.destroyBlock(entry.getKey(), false);
 
             }
 

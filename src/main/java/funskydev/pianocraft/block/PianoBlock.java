@@ -7,50 +7,46 @@ import funskydev.pianocraft.util.BlockPosEnum;
 import funskydev.pianocraft.util.MultiblockEnum;
 import funskydev.pianocraft.util.MultiblockUtil;
 import funskydev.pianocraft.util.NoteUtil;
-import net.minecraft.block.AbstractBlock;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.HorizontalFacingBlock;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.screen.NamedScreenHandlerFactory;
-import net.minecraft.screen.SimpleNamedScreenHandlerFactory;
-import net.minecraft.sound.BlockSoundGroup;
-import net.minecraft.sound.SoundCategory;
-import net.minecraft.sound.SoundEvents;
-import net.minecraft.text.Text;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.Hand;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.world.BlockView;
-import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Random;
+import net.minecraft.client.Minecraft;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.MenuProvider;
+import net.minecraft.world.SimpleMenuProvider;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.HorizontalDirectionalBlock;
+import net.minecraft.world.level.block.SoundType;
+import net.minecraft.world.level.block.state.BlockBehaviour;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.BlockHitResult;
 
 public class PianoBlock extends MultiblockMainPartBlock {
 
-    public static final MapCodec<PianoBlock> CODEC = PianoBlock.createCodec(PianoBlock::new);
+    public static final MapCodec<PianoBlock> CODEC = PianoBlock.simpleCodec(PianoBlock::new);
 
-    private static final Text CONTAINER_TITLE = Text.translatable("container.pianocraft.piano");
+    private static final Component CONTAINER_TITLE = Component.translatable("container.pianocraft.piano");
 
-    public PianoBlock(AbstractBlock.Settings settings) {
+    public PianoBlock(BlockBehaviour.Properties settings) {
         super(settings
-                .mapColor(Blocks.SPRUCE_PLANKS.getDefaultMapColor())
+                .mapColor(Blocks.SPRUCE_PLANKS.defaultMapColor())
                 .strength(1.0f, 3.0f)
-                .nonOpaque()
-                .sounds(BlockSoundGroup.WOOD),
+                .noOcclusion()
+                .sound(SoundType.WOOD),
                 MultiblockEnum.PIANO);
     }
 
     // Behavior
 
     @Override
-    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult hit) {
+    public InteractionResult useWithoutItem(BlockState state, Level world, BlockPos pos, Player player, BlockHitResult hit) {
 
         BlockState mainBlockState = state;
         BlockPos mainBlockPos = pos;
@@ -60,35 +56,35 @@ public class PianoBlock extends MultiblockMainPartBlock {
 
             BlockPosEnum multiblockPartPos = multiblockPart.getMultiblockPartPos();
 
-            if (multiblockPartPos.isTop()) return ActionResult.PASS;
+            if (multiblockPartPos.isTop()) return InteractionResult.PASS;
 
-            mainBlockPos = MultiblockUtil.getMainBlock(pos, multiblockPartPos, state.get(FACING));
+            mainBlockPos = MultiblockUtil.getMainBlock(pos, multiblockPartPos, state.getValue(FACING));
             mainBlockState = world.getBlockState(mainBlockPos);
         }
 
-        if (!(mainBlockState.getBlock() instanceof MultiblockMainPartBlock)) return ActionResult.PASS;
+        if (!(mainBlockState.getBlock() instanceof MultiblockMainPartBlock)) return InteractionResult.PASS;
 
-        if (hit.getSide() == mainBlockState.get(FACING) || hit.getSide() == Direction.UP) {
+        if (hit.getDirection() == mainBlockState.getValue(FACING) || hit.getDirection() == Direction.UP) {
 
-            if (world.isClient) {
-                MinecraftClient.getInstance().gameRenderer.firstPersonRenderer.resetEquipProgress(Hand.OFF_HAND);
-                return ActionResult.SUCCESS;
+            if (world.isClientSide) {
+                Minecraft.getInstance().gameRenderer.itemInHandRenderer.itemUsed(InteractionHand.OFF_HAND);
+                return InteractionResult.SUCCESS;
             }
 
-            player.openHandledScreen(mainBlockState.createScreenHandlerFactory(world, mainBlockPos));
+            player.openMenu(mainBlockState.getMenuProvider(world, mainBlockPos));
             // piano stat ?
-            return ActionResult.CONSUME;
+            return InteractionResult.CONSUME;
 
         }
 
-        return ActionResult.PASS;
+        return InteractionResult.PASS;
 
     }
 
     @Nullable
     @Override
-    public NamedScreenHandlerFactory createScreenHandlerFactory(BlockState state, World world, BlockPos pos) {
-        return new SimpleNamedScreenHandlerFactory(
+    public MenuProvider getMenuProvider(BlockState state, Level world, BlockPos pos) {
+        return new SimpleMenuProvider(
                 ((syncId, inventory, player) -> new PianoScreenHandler(syncId, inventory, pos)),
                 CONTAINER_TITLE
         );
@@ -97,14 +93,14 @@ public class PianoBlock extends MultiblockMainPartBlock {
     // Rendering
 
     @Override
-    public float getAmbientOcclusionLightLevel(BlockState state, BlockView world, BlockPos pos) {
+    public float getShadeBrightness(BlockState state, BlockGetter world, BlockPos pos) {
         return 1.0f;
     }
 
     // Registry
 
     @Override
-    public MapCodec<? extends HorizontalFacingBlock> getCodec() {
+    public MapCodec<? extends HorizontalDirectionalBlock> codec() {
         return CODEC;
     }
 

@@ -1,10 +1,10 @@
 package funskydev.pianocraft.util;
 
-import net.minecraft.util.function.BooleanBiFunction;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.shape.VoxelShape;
-import net.minecraft.util.shape.VoxelShapes;
+import net.minecraft.core.Direction;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.shapes.BooleanOp;
+import net.minecraft.world.phys.shapes.Shapes;
+import net.minecraft.world.phys.shapes.VoxelShape;
 
 public class VoxelShapeUtil {
 
@@ -12,12 +12,12 @@ public class VoxelShapeUtil {
 
         if (facing == Direction.NORTH) return shape;
 
-        VoxelShape rotatedShape = VoxelShapes.empty();
+        VoxelShape rotatedShape = Shapes.empty();
 
-        for (Box box : shape.getBoundingBoxes()) {
+        for (AABB box : shape.toAabbs()) {
 
             double[] rotatedCoords = rotateBoxCoords(box.minX, box.minY, box.minZ, box.maxX, box.maxY, box.maxZ, facing);
-            rotatedShape = VoxelShapes.combineAndSimplify(rotatedShape, VoxelShapes.cuboid(rotatedCoords[0], rotatedCoords[1], rotatedCoords[2], rotatedCoords[3], rotatedCoords[4], rotatedCoords[5]), BooleanBiFunction.OR);
+            rotatedShape = Shapes.join(rotatedShape, Shapes.box(rotatedCoords[0], rotatedCoords[1], rotatedCoords[2], rotatedCoords[3], rotatedCoords[4], rotatedCoords[5]), BooleanOp.OR);
 
         }
 
