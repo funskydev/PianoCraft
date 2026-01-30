@@ -7,18 +7,17 @@ import funskydev.pianocraft.network.PianoKeyPressedPayload;
 import funskydev.pianocraft.screen.PianoScreenHandler;
 import funskydev.pianocraft.util.NoteUtil;
 import funskydev.pianocraft.util.NotesEnum;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractButton;
 import net.minecraft.client.gui.components.StringWidget;
 import net.minecraft.client.gui.components.Tooltip;
-import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
-import net.minecraft.client.input.InputWithModifiers;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.Identifier;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.InteractionHand;
@@ -28,6 +27,7 @@ import org.lwjgl.glfw.GLFW;
 import java.util.ArrayList;
 import java.util.List;
 
+@Environment(EnvType.CLIENT)
 public class PianoScreen extends AbstractContainerScreen<PianoScreenHandler> {
 
     private static final Identifier TEXTURE = Identifier.fromNamespaceAndPath(PCMain.MOD_ID, "textures/gui/piano.png");
@@ -50,24 +50,11 @@ public class PianoScreen extends AbstractContainerScreen<PianoScreenHandler> {
 
         this.keyWidgets.clear();
 
-        this.addRenderableWidget(new StringWidget(10, 10, 120, 0, Component.nullToEmpty("Piano menu"), this.font));
+        this.addRenderableWidget(new StringWidget(7, 10, 120, 0, Component.nullToEmpty("Piano menu"), this.font));
 
-        this.midiDeviceButton = new AbstractButton(10, 20, 120, 20, Component.nullToEmpty("Unknown")) {
-            @Override
-            public void onPress(InputWithModifiers input) {
-                midiDeviceButtonPressed();
-            }
-
-            @Override
-            protected void renderContents(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
-
-            }
-
-            @Override
-            protected void updateWidgetNarration(NarrationElementOutput builder) {
-
-            }
-        };
+        this.midiDeviceButton = new MidiDeviceSelectorButton(7, 20, 120, 20,
+                Component.literal("Midi Device Selector"),
+                button -> midiDeviceButtonPressed());
 
         this.addRenderableWidget(this.midiDeviceButton);
 
@@ -96,10 +83,10 @@ public class PianoScreen extends AbstractContainerScreen<PianoScreenHandler> {
 
         }
 
-        this.hideKeysText = new StringWidget(10, 50, 120, 0, Component.nullToEmpty(""), this.font);
+        this.hideKeysText = new StringWidget(7, 50, 128, 0, Component.nullToEmpty(""), this.font);
         this.addRenderableWidget(this.hideKeysText);
 
-        this.arrowsText = new StringWidget(10, 118, 120, 0, Component.nullToEmpty("Arrows - Change octave"), this.font);
+        this.arrowsText = new StringWidget(7, 118, 128, 0, Component.nullToEmpty("Arrows - Change octave"), this.font);
         this.addRenderableWidget(this.arrowsText);
 
         PCMainClient.searchForMidiDeviceIfNoneSelected();
@@ -120,7 +107,7 @@ public class PianoScreen extends AbstractContainerScreen<PianoScreenHandler> {
     @Override
     protected void renderBg(GuiGraphics context, float delta, int mouseX, int mouseY) {
         if (!showKeybindings) return;
-        context.blit(RenderPipelines.GUI_TEXTURED, TEXTURE, 6, 45, 0, 0, 0, 128, 64, 128, 64);
+        context.blit(RenderPipelines.GUI_TEXTURED, TEXTURE, 4, 45, 0f, 0f, 128, 64, 128, 64);
     }
 
     @Override
@@ -160,7 +147,7 @@ public class PianoScreen extends AbstractContainerScreen<PianoScreenHandler> {
 
         }
 
-        for(KeysEnum key : KeysEnum.values()) {
+        for (KeysEnum key : KeysEnum.values()) {
             if (pressedKey.getName().equals(key.getTranslationKey())) {
                 playNote(key.getNote(), key.getOctave());
             }

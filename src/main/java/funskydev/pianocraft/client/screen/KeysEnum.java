@@ -38,10 +38,10 @@ public enum KeysEnum {
     J("key.keyboard.j"),
     M("key.keyboard.m");
 
-    private String translationKey;
+    private final String translationKey;
 
-    private NotesEnum note;
-    private int octave;
+    private final NotesEnum note;
+    private final int octave;
 
     KeysEnum(String translationKey) {
         this.translationKey = translationKey;
