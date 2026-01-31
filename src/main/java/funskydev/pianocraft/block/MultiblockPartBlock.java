@@ -1,7 +1,6 @@
 package funskydev.pianocraft.block;
 
 import com.mojang.serialization.MapCodec;
-import funskydev.pianocraft.PCMain;
 import funskydev.pianocraft.util.BlockPosEnum;
 import funskydev.pianocraft.util.MultiblockUtil;
 import funskydev.pianocraft.util.VoxelShapeUtil;
@@ -51,7 +50,7 @@ public class MultiblockPartBlock extends HorizontalDirectionalBlock {
     }
 
     // Behaviors
-    
+
     @Override
     public InteractionResult useWithoutItem(BlockState state, Level world, BlockPos pos, Player player, BlockHitResult hit) {
         return mainBlock.useWithoutItem(state, world, pos, player, hit);
@@ -67,16 +66,12 @@ public class MultiblockPartBlock extends HorizontalDirectionalBlock {
     @Override
     public VoxelShape getShape(BlockState state, BlockGetter world, BlockPos pos, CollisionContext context) {
 
-        switch (state.getValue(FACING)) {
-            case EAST:
-                return eastShape;
-            case SOUTH:
-                return southShape;
-            case WEST:
-                return westShape;
-            default:
-                return northShape;
-        }
+        return switch (state.getValue(FACING)) {
+            case EAST -> eastShape;
+            case SOUTH -> southShape;
+            case WEST -> westShape;
+            default -> northShape;
+        };
 
     }
 
@@ -116,7 +111,7 @@ public class MultiblockPartBlock extends HorizontalDirectionalBlock {
 
     @Override
     public BlockState getStateForPlacement(BlockPlaceContext ctx) {
-        return (BlockState)this.defaultBlockState().setValue(FACING, ctx.getHorizontalDirection().getOpposite());
+        return (BlockState) this.defaultBlockState().setValue(FACING, ctx.getHorizontalDirection().getOpposite());
     }
 
     @Override
@@ -139,7 +134,7 @@ public class MultiblockPartBlock extends HorizontalDirectionalBlock {
         Direction facing = state.getValue(FACING);
         BlockPos targetPos = MultiblockUtil.getMainBlock(pos, multiblockPartPos, facing);
 
-        if(world.getBlockState(targetPos).is(mainBlock)) mainBlock.destroyMultiblockParts(world, targetPos, state);
+        if (world.getBlockState(targetPos).is(mainBlock)) mainBlock.destroyMultiblockParts(world, targetPos, state);
 
     }
 

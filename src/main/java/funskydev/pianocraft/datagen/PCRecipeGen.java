@@ -4,15 +4,13 @@ import funskydev.pianocraft.registry.PCBlocks;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricRecipeProvider;
 import net.minecraft.core.HolderLookup;
-import net.minecraft.core.registries.Registries;
 import net.minecraft.data.recipes.RecipeCategory;
 import net.minecraft.data.recipes.RecipeOutput;
 import net.minecraft.data.recipes.RecipeProvider;
-import net.minecraft.data.recipes.packs.VanillaRecipeProvider;
 import net.minecraft.tags.ItemTags;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Blocks;
+
 import java.util.concurrent.CompletableFuture;
 
 public class PCRecipeGen extends FabricRecipeProvider {
@@ -27,9 +25,7 @@ public class PCRecipeGen extends FabricRecipeProvider {
             @Override
             public void buildRecipes() {
 
-                HolderLookup.RegistryLookup<Item> itemLookup = registries.lookupOrThrow(Registries.ITEM);
-
-                shaped(RecipeCategory.DECORATIONS, PCBlocks.PIANO) // You can also specify an int to produce more than one
+                shaped(RecipeCategory.DECORATIONS, PCBlocks.PIANO)
                         .define('P', ItemTags.PLANKS)
                         .define('N', Blocks.NOTE_BLOCK)
                         .define('S', Items.STRING)

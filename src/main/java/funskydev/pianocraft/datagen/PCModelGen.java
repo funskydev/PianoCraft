@@ -18,8 +18,6 @@ public class PCModelGen extends FabricModelProvider {
 
         blockModelGenerators.createNonTemplateHorizontalBlock(PCBlocks.PIANO);
 
-        // add empty multiblock models
-
         PCBlocks.MULTIBLOCKS.keySet()
                 .forEach(multiblockPartBlock -> blockModelGenerators.createNonTemplateModelBlock(multiblockPartBlock, Blocks.AIR));
 
