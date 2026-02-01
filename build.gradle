@@ -98,7 +98,6 @@ publishing {
 publishMods {
     file = remapJar.archiveFile
     type = STABLE
-    version = "$version"
     displayName = "PianoCraft $mod_version - $minecraft_version"
     changelog = getChangelogForVersion(mod_version)
 
@@ -121,6 +120,8 @@ publishMods {
         accessToken = providers.environmentVariable("CURSEFORGE_API_KEY")
         projectId = "859363"
         minecraftVersions.add("$minecraft_version")
+        clientRequired = true
+        serverRequired = true
     }
 }
 
