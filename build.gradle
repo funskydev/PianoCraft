@@ -98,7 +98,6 @@ publishing {
 publishMods {
     file = remapJar.archiveFile
     type = STABLE
-    version = "$version"
     displayName = "PianoCraft $mod_version - $minecraft_version"
     changelog = getChangelogForVersion(mod_version)
 
@@ -109,6 +108,12 @@ publishMods {
         repository = "FunskyDev/PianoCraft"
         commitish = calculateGitHash()
         tagName = providers.environmentVariable("VERSION_TAG")
+    }
+
+    modrinth {
+        accessToken = providers.environmentVariable("MODRINTH_API_KEY")
+        projectId = "qgvzPai8"
+        minecraftVersions.add("$minecraft_version")
     }
 }
 

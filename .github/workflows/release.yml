@@ -84,4 +84,5 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           VERSION_TAG: ${{ steps.version.outputs.version_tag }}
+          MODRINTH_API_KEY: ${{ secrets.MODRINTH_API_KEY }}
 
