@@ -98,6 +98,7 @@ publishing {
 publishMods {
     file = remapJar.archiveFile
     type = STABLE
+    version = "$version"
     displayName = "PianoCraft $mod_version - $minecraft_version"
     changelog = getChangelogForVersion(mod_version)
 
