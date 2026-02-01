@@ -14,6 +14,12 @@ jobs:
     permissions:
       contents: write
     steps:
+      - name: Checkout source at triggering commit
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
+          fetch-depth: 0
+
       - name: Detect tag from triggering run
         id: tag
         run: |
@@ -32,6 +38,20 @@ jobs:
         if: steps.tag.outputs.tag == ''
         run: echo "No tag detected; skipping release."
 
+      - name: Compute release name
+        id: meta
+        if: steps.tag.outputs.tag != ''
+        run: |
+          mod_version=$(grep '^mod_version=' gradle.properties | cut -d'=' -f2)
+          mc_version=$(grep '^minecraft_version=' gradle.properties | cut -d'=' -f2)
+          mod_name=$(jq -r '.name' src/main/resources/fabric.mod.json)
+          if [ -z "$mod_name" ] || [ "$mod_name" = "null" ]; then
+            echo "Missing mod name in fabric.mod.json" >&2
+            exit 1
+          fi
+          release_name="${mod_name} ${mod_version} - ${mc_version}"
+          echo "release_name=${release_name}" >> "$GITHUB_OUTPUT"
+
       - name: Download build artifacts
         if: steps.tag.outputs.tag != ''
         uses: actions/download-artifact@v4
@@ -46,7 +66,7 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           tag_name: ${{ steps.tag.outputs.tag }}
-          name: ${{ steps.tag.outputs.tag }}
+          name: ${{ steps.meta.outputs.release_name }}
           generate_release_notes: true
           files: artifacts/**/*
         env:
