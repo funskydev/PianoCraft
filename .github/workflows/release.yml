@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       overwrite:
-        description: 'Overwrite existing release and tag if they exist'
+        description: 'Overwrite existing release tag'
         required: false
         default: false
         type: boolean
@@ -58,7 +58,7 @@ jobs:
           # Delete local tag
           git tag -d ${{ steps.version.outputs.version_tag }} || true
 
-      - name: Create Git tag
+      - name: Create Git release tag
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
