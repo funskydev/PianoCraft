@@ -2,6 +2,12 @@ name: release
 
 on:
   workflow_dispatch:
+    inputs:
+      overwrite:
+        description: 'Overwrite existing release and tag if they exist'
+        required: false
+        default: false
+        type: boolean
 
 jobs:
   release:
@@ -12,6 +18,52 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+
+      - name: Extract version tag from gradle.properties
+        id: version
+        run: |
+          VERSION=$(grep '^mod_version=' gradle.properties | cut -d'=' -f2)
+          echo "version_tag=$VERSION" >> $GITHUB_OUTPUT
+          echo "Extracted version: $VERSION"
+
+      - name: Check if tag exists
+        id: check_tag
+        run: |
+          git fetch --tags
+          if git rev-parse "refs/tags/${{ steps.version.outputs.version_tag }}" >/dev/null 2>&1; then
+            echo "exists=true" >> $GITHUB_OUTPUT
+            echo "Tag ${{ steps.version.outputs.version_tag }} already exists"
+          else
+            echo "exists=false" >> $GITHUB_OUTPUT
+            echo "Tag ${{ steps.version.outputs.version_tag }} does not exist"
+          fi
+
+      - name: Stop if tag exists and overwrite is disabled
+        if: steps.check_tag.outputs.exists == 'true' && inputs.overwrite == false
+        run: |
+          echo "::error::Tag ${{ steps.version.outputs.version_tag }} already exists. Set 'overwrite' to true to overwrite the existing release."
+          exit 1
+
+      - name: Delete existing tag and release if overwrite is enabled
+        if: steps.check_tag.outputs.exists == 'true' && inputs.overwrite == true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "Overwrite enabled. Deleting existing tag..."
+          
+          # Delete remote tag
+          git push --delete origin ${{ steps.version.outputs.version_tag }} || true
+          
+          # Delete local tag
+          git tag -d ${{ steps.version.outputs.version_tag }} || true
+
+      - name: Create Git tag
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git tag -a ${{ steps.version.outputs.version_tag }} -m "Release tag ${{ steps.version.outputs.version_tag }}"
+          git push origin ${{ steps.version.outputs.version_tag }}
+          echo "Created and pushed tag: ${{ steps.version.outputs.version_tag }}"
 
       - name: Validate gradle wrapper
         uses: gradle/actions/wrapper-validation@v4
@@ -30,4 +82,5 @@ jobs:
         run: ./gradlew clean build publishMods
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      
+          VERSION_TAG: ${{ steps.version.outputs.version_tag }}
+

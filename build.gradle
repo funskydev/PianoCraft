@@ -100,7 +100,7 @@ publishMods {
     type = STABLE
     version = "$version"
     displayName = "PianoCraft $mod_version - $minecraft_version"
-    changelog = "test"
+    changelog = getChangelogForVersion(mod_version)
 
     modLoaders.add("fabric")
 
@@ -108,8 +108,7 @@ publishMods {
         accessToken = providers.environmentVariable("GITHUB_TOKEN")
         repository = "FunskyDev/PianoCraft"
         commitish = calculateGitHash()
-        tagName = "$version"
-
+        tagName = providers.environmentVariable("VERSION_TAG")
     }
 }
 
@@ -121,5 +120,38 @@ String calculateGitHash() {
         return output.standardOutput.asText.get().trim()
     } catch (Throwable ignored) {
         return "unknown"
+    }
+}
+
+String getChangelogForVersion(String version) {
+    File changelogFile = file("CHANGELOG.md")
+    if (!changelogFile.exists()) {
+        return "No changelog available"
+    }
+
+    try {
+        String content = changelogFile.text
+        String versionHeader = "## [$version]"
+        int startIndex = content.indexOf(versionHeader)
+
+        if (startIndex == -1) {
+            return "No changelog found for version $version"
+        }
+
+        // Find the start of the content (skip the version header line)
+        startIndex = content.indexOf("\n", startIndex) + 1
+
+        // Find the next version header or end of file
+        int endIndex = content.indexOf("\n## [", startIndex)
+        if (endIndex == -1) {
+            endIndex = content.length()
+        }
+
+        // Extract and trim the changelog content
+        String changelog = content.substring(startIndex, endIndex).trim()
+
+        return changelog.isEmpty() ? "No changelog content for version $version" : changelog
+    } catch (Exception e) {
+        return "Error reading changelog: ${e.message}"
     }
 }
