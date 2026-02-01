@@ -80,9 +80,10 @@ jobs:
         run: chmod +x ./gradlew
 
       - name: Build and publish
-        run: ./gradlew clean build publishMods
+        run: ./gradlew clean build publishMods --stacktrace --no-configuration-cache
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           VERSION_TAG: ${{ steps.version.outputs.version_tag }}
           MODRINTH_API_KEY: ${{ secrets.MODRINTH_API_KEY }}
+          CURSEFORGE_API_KEY: ${{ secrets.CURSEFORGE_API_KEY }}
 
