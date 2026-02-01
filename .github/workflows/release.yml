@@ -1,0 +1,95 @@
+name: release
+
+on:
+  workflow_run:
+    workflows: [ "build" ]
+    types: [ completed ]
+  workflow_dispatch:
+
+jobs:
+  release:
+    name: create release from build artifacts
+    if: github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'push'
+    runs-on: ubuntu-22.04
+    permissions:
+      contents: write
+    steps:
+      - name: Detect tag from triggering run
+        id: tag
+        run: |
+          tag="${{ github.event.workflow_run.head_branch }}"
+          if [ -z "$tag" ]; then
+            echo "tag=" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          if git ls-remote --exit-code --tags https://github.com/${{ github.repository }} "refs/tags/${tag}" > /dev/null; then
+            echo "tag=$tag" >> "$GITHUB_OUTPUT"
+          else
+            echo "tag=" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Stop if not a tag build
+        if: steps.tag.outputs.tag == ''
+        run: echo "No tag detected; skipping release."
+
+      - name: Download build artifacts
+        if: steps.tag.outputs.tag != ''
+        uses: actions/download-artifact@v4
+        with:
+          name: Artifacts
+          run-id: ${{ github.event.workflow_run.id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: artifacts
+
+      - name: Create GitHub release
+        if: steps.tag.outputs.tag != ''
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ steps.tag.outputs.tag }}
+          name: ${{ steps.tag.outputs.tag }}
+          generate_release_notes: true
+          files: artifacts/**/*
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  tag_from_versions:
+    name: create tag from mod and mc versions
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-22.04
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Compute tag from gradle.properties
+        id: version
+        run: |
+          mod_version=$(grep '^mod_version=' gradle.properties | cut -d'=' -f2)
+          mc_version=$(grep '^minecraft_version=' gradle.properties | cut -d'=' -f2)
+          if [ -z "$mod_version" ] || [ -z "$mc_version" ]; then
+            echo "Missing versions in gradle.properties" >&2
+            exit 1
+          fi
+          tag="$mod_version+$mc_version"
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+
+      - name: Ensure tag does not already exist
+        run: |
+          tag="${{ steps.version.outputs.tag }}"
+          if git ls-remote --exit-code --tags origin "refs/tags/${tag}" > /dev/null; then
+            echo "Tag ${tag} already exists" >&2
+            exit 1
+          fi
+
+      - name: Create and push tag
+        env:
+          TAG: ${{ steps.version.outputs.tag }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git tag "$TAG"
+          git push "https://${GITHUB_ACTOR}:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" "$TAG"
