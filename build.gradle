@@ -116,11 +116,11 @@ publishMods {
         minecraftVersions.add("$minecraft_version")
     }
 
-    /*curseforge {
+    curseforge {
         accessToken = providers.environmentVariable("CURSEFORGE_API_KEY")
-        projectId = "308769"
+        projectId = "859363"
         minecraftVersions.add("$minecraft_version")
-    }*/
+    }
 }
 
 String calculateGitHash() {
