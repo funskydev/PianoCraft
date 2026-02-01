@@ -110,18 +110,29 @@ publishMods {
         tagName = providers.environmentVariable("VERSION_TAG")
     }
 
-    modrinth {
-        accessToken = providers.environmentVariable("MODRINTH_API_KEY")
-        projectId = "qgvzPai8"
-        minecraftVersions.add("$minecraft_version")
+    discord {
+        webhookUrl = providers.environmentVariable("DISCORD_WEBHOOK_URL")
+        content = changelog.map { "# **PianoCraft $mod_version 🎹 - $minecraft_version** has been updated !\n" + it }
     }
 
-    curseforge {
-        accessToken = providers.environmentVariable("CURSEFORGE_API_KEY")
-        projectId = "859363"
-        minecraftVersions.add("$minecraft_version")
-        clientRequired = true
-        serverRequired = true
+    def skipModrinth = providers.environmentVariable("SKIP_MODRINTH").getOrElse("false") == "true"
+    if (!skipModrinth) {
+        modrinth {
+            accessToken = providers.environmentVariable("MODRINTH_API_KEY")
+            projectId = "qgvzPai8"
+            minecraftVersions.add("$minecraft_version")
+        }
+    }
+
+    def skipCurseforge = providers.environmentVariable("SKIP_CURSEFORGE").getOrElse("false") == "true"
+    if (!skipCurseforge) {
+        curseforge {
+            accessToken = providers.environmentVariable("CURSEFORGE_API_KEY")
+            projectId = "859363"
+            minecraftVersions.add("$minecraft_version")
+            clientRequired = true
+            serverRequired = true
+        }
     }
 }
 

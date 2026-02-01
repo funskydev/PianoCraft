@@ -8,6 +8,16 @@ on:
         required: false
         default: false
         type: boolean
+      skip_modrinth:
+        description: 'Skip publishing to Modrinth'
+        required: false
+        default: false
+        type: boolean
+      skip_curseforge:
+        description: 'Skip publishing to CurseForge'
+        required: false
+        default: false
+        type: boolean
 
 jobs:
   release:
@@ -86,4 +96,7 @@ jobs:
           VERSION_TAG: ${{ steps.version.outputs.version_tag }}
           MODRINTH_API_KEY: ${{ secrets.MODRINTH_API_KEY }}
           CURSEFORGE_API_KEY: ${{ secrets.CURSEFORGE_API_KEY }}
+          SKIP_MODRINTH: ${{ inputs.skip_modrinth }}
+          SKIP_CURSEFORGE: ${{ inputs.skip_curseforge }}
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
 
