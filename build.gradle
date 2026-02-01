@@ -108,11 +108,7 @@ publishMods {
         repository = "FunskyDev/PianoCraft"
         commitish = calculateGitHash()
         tagName = providers.environmentVariable("VERSION_TAG")
-    }
-
-    discord {
-        webhookUrl = providers.environmentVariable("DISCORD_WEBHOOK_URL")
-        content = changelog.map { "# **PianoCraft $mod_version 🎹 - $minecraft_version** has been updated !\n" + it }
+        announcementTitle = "Download from GitHub :github:"
     }
 
     def skipModrinth = providers.environmentVariable("SKIP_MODRINTH").getOrElse("false") == "true"
@@ -121,6 +117,7 @@ publishMods {
             accessToken = providers.environmentVariable("MODRINTH_API_KEY")
             projectId = "qgvzPai8"
             minecraftVersions.add("$minecraft_version")
+            announcementTitle = "Download from Modrinth :modrinth:"
         }
     }
 
@@ -132,7 +129,13 @@ publishMods {
             minecraftVersions.add("$minecraft_version")
             clientRequired = true
             serverRequired = true
+            announcementTitle = "Download from CurseForge :curseforge:"
         }
+    }
+
+    discord {
+        webhookUrl = providers.environmentVariable("DISCORD_WEBHOOK_URL")
+        content = changelog.map { "# 🎹 PianoCraft $mod_version - $minecraft_version** update available !\n**Changelog :**\n" + it }
     }
 }
 
