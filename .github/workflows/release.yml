@@ -22,8 +22,9 @@ jobs:
       - name: Extract version tag from gradle.properties
         id: version
         run: |
-          VERSION=$(grep '^mod_version=' gradle.properties | cut -d'=' -f2)
-          echo "version_tag=$VERSION" >> $GITHUB_OUTPUT
+          MOD_VERSION=$(grep '^mod_version=' gradle.properties | cut -d'=' -f2)
+          MC_VERSION=$(grep '^minecraft_version=' gradle.properties | cut -d'=' -f2)
+          echo "version_tag=${MOD_VERSION}+${MC_VERSION}" >> $GITHUB_OUTPUT
           echo "Extracted version: $VERSION"
 
       - name: Check if tag exists
