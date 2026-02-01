@@ -135,7 +135,7 @@ publishMods {
 
     discord {
         webhookUrl = providers.environmentVariable("DISCORD_WEBHOOK_URL")
-        content = changelog.map { "# 🎹 PianoCraft $mod_version - $minecraft_version** update available !\n**Changelog :**\n" + it }
+        content = changelog.map { "# 🎹 PianoCraft $mod_version - $minecraft_version update available !\n**Changelog :**\n" + it }
     }
 }
 
