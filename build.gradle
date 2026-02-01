@@ -1,6 +1,7 @@
 plugins {
     id 'net.fabricmc.fabric-loom-remap' version "${loom_version}"
     id 'maven-publish'
+    id "me.modmuss50.mod-publish-plugin" version "1.1.0"
 }
 
 version = "${project.mod_version}+${project.minecraft_version}"
@@ -91,5 +92,33 @@ publishing {
         // Notice: This block does NOT have the same function as the block in the top level.
         // The repositories here will be used for publishing your artifact, not for
         // retrieving dependencies.
+    }
+}
+
+publishMods {
+    file = remapJar.archiveFile
+    type = STABLE
+    version = "$version"
+    displayName = "PianoCraft $mod_version - $minecraft_version"
+
+    modLoaders.add("fabric")
+
+    github {
+        accessToken = providers.environmentVariable("GITHUB_TOKEN")
+        repository = "FunskyDev/PianoCraft"
+        commitish = calculateGitHash()
+        tagName = "$version"
+
+    }
+}
+
+String calculateGitHash() {
+    try {
+        ExecOutput output = providers.exec {
+            commandLine("git", "rev-parse", "HEAD")
+        }
+        return output.standardOutput.asText.get().trim()
+    } catch (Throwable ignored) {
+        return "unknown"
     }
 }
