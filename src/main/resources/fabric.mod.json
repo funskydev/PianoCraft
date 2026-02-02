@@ -1,37 +1,34 @@
 {
-	"schemaVersion": 1,
-	"id": "pianocraft",
-	"version": "${version}",
-	"name": "PianoCraft",
-	"description": "PianoCraft is a mod that adds a playable piano to the game, allowing players to create their own musical compositions within Minecraft.",
-	"authors": [
-		"FunskyDev"
-	],
-	"contact": {
-		"sources": "https://github.com/funskydev/PianoCraft"
-	},
-	"license": "LGPL-2.1",
-	"icon": "assets/pianocraft/icon.png",
-	"environment": "*",
-	"entrypoints": {
-		"main": [
-			"funskydev.pianocraft.PCMain"
-		],
-		"client": [
-			"funskydev.pianocraft.client.PCMainClient"
-		],
-		"fabric-datagen": [
-			"funskydev.pianocraft.datagen.PCDataGen"
-		]
-	},
-	"mixins": [
-		"pianocraft.mixins.json"
-	],
-	"accessWidener": "pianocraft.accesswidener",
-	"depends": {
-		"fabricloader": "*",
-		"minecraft": "~1.21.11",
-		"java": ">=21",
-		"fabric-api": "*"
-	}
+  "schemaVersion": 1,
+  "id": "pianocraft",
+  "version": "${version}",
+  "name": "PianoCraft",
+  "description": "PianoCraft is a mod that adds a playable piano to the game, allowing players to create their own musical compositions within Minecraft.",
+  "authors": [
+    "FunskyDev"
+  ],
+  "contact": {
+    "sources": "https://github.com/funskydev/PianoCraft"
+  },
+  "license": "LGPL-2.1",
+  "icon": "assets/pianocraft/icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "funskydev.pianocraft.PCMain"
+    ],
+    "client": [
+      "funskydev.pianocraft.client.PCMainClient"
+    ]
+  },
+  "mixins": [
+    "pianocraft.mixins.json"
+  ],
+  "accessWidener": "pianocraft.accesswidener",
+  "depends": {
+    "fabricloader": "*",
+    "minecraft": "~1.21.11",
+    "java": ">=21",
+    "fabric-api": "*"
+  }
 }

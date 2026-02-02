@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "id": "pianocraft-datagen",
+  "version": "1",
+  "entrypoints": {
+    "fabric-datagen": [
+      "funskydev.pianocraft.datagen.PCDataGen"
+    ]
+  }
+}
